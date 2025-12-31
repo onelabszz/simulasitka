@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CBT TKA SD</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1565c0; --dark: #0d47a1; --light: #f4f6f9;
+            --success: #2e7d32; --warning: #f57f17; --danger: #c62828;
+            --text: #333; --sidebar-width: 250px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--light); display: flex; height: 100vh; overflow: hidden; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width); background: #fff; border-right: 1px solid #ddd;
+            display: flex; flex-direction: column; z-index: 10;
+        }
+        .brand {
+            height: 60px; display: flex; align-items: center; justify-content: center;
+            background: var(--primary); color: white; font-weight: bold; font-size: 1.2rem;
+            gap: 10px;
+        }
+        .menu { flex: 1; padding: 20px 0; }
+        .menu-item {
+            padding: 12px 25px; cursor: pointer; color: #555; display: flex; align-items: center; gap: 15px;
+            transition: 0.2s; border-left: 4px solid transparent; font-weight: 500;
+        }
+        .menu-item:hover, .menu-item.active { background: #e3f2fd; color: var(--primary); border-left-color: var(--primary); }
+        .menu-item i { width: 20px; text-align: center; }
+
+        /* MAIN CONTENT */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* HEADER */
+        header {
+            height: 60px; background: white; border-bottom: 1px solid #ddd;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
+        }
+        .live-badge {
+            background: #e8f5e9; color: var(--success); padding: 5px 12px;
+            border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 8px;
+        }
+        .blink { width: 10px; height: 10px; background: var(--success); border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* DASHBOARD CONTENT */
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        
+        /* STAT CARDS */
+        .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .card-info h3 { font-size: 2rem; margin: 5px 0; color: var(--text); }
+        .card-info span { color: #777; font-size: 0.9rem; }
+        .icon-box { width: 50px; height: 50px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: white; }
+        
+        /* TABLE */
+        .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .table-header { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #555; }
+        tr:hover { background: #fafafa; }
+        
+        /* STATUS BADGES */
+        .badge { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .bg-blue { background: #e3f2fd; color: #1565c0; } /* Mengerjakan */
+        .bg-green { background: #e8f5e9; color: #2e7d32; } /* Selesai */
+        .bg-gray { background: #eceff1; color: #546e7a; } /* Belum Login */
+
+        /* BUTTONS */
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-refresh { background: var(--primary); color: white; }
+        .btn-excel { background: var(--success); color: white; }
+        .btn-reset { background: #ffcdd2; color: #c62828; padding: 4px 8px; font-size: 0.75rem; }
+        .btn:hover { opacity: 0.9; }
+
+        @media (max-width: 1024px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="brand">
+            <i class="fas fa-laptop-code"></i> ADMIN TKA
+        </div>
+        <div class="menu">
+            <div class="menu-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+            <div class="menu-item"><i class="fas fa-users"></i> Data Siswa</div>
+            <div class="menu-item"><i class="fas fa-file-alt"></i> Bank Soal</div>
+            <div class="menu-item"><i class="fas fa-chart-bar"></i> Laporan Nilai</div>
+            <div class="menu-item" style="margin-top:auto; color:red;"><i class="fas fa-sign-out-alt"></i> Keluar</div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <header>
+            <h3 style="color:#444;">Monitoring Ujian - Sesi 1</h3>
+            <div class="live-badge">
+                <div class="blink"></div> LIVE UPDATE
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-weight:600;">Admin Sekolah</span>
+                <div style="width:35px; height:35px; background:#ccc; border-radius:50%;"></div>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-info">
+                        <span id="totalSiswa">0</span>
+                        <h3>Total Siswa</h3>
+                    </div>
+                    <div class="icon-box" style="background:var(--primary);"><i class="fas fa-user-graduate"></i></div>
+                </div>
+                <div class="card">
+                    <div class="card-info">
+                        <span id="activeSiswa">0</span>
+                        <h3>Sedang Ujian</h3>
+                    </div>
+                    <div class="icon-box" style="background:var(--warning);"><i class="fas fa-pen"></i></div>
+                </div>
+                <div class="card">
+                    <div class="card-info">
+                        <span id="doneSiswa">0</span>
+                        <h3>Selesai</h3>
+                    </div>
+                    <div class="icon-box" style="background:var(--success);"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="card">
+                    <div class="card-info">
+                        <span id="avgScore">0</span>
+                        <h3>Rata-rata Nilai</h3>
+                    </div>
+                    <div class="icon-box" style="background:#5c6bc0;"><i class="fas fa-star"></i></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h4>Status Peserta Ujian</h4>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-refresh" onclick="refreshData()"><i class="fas fa-sync"></i> Refresh</button>
+                        <button class="btn btn-excel" onclick="exportData()"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Siswa</th>
+                            <th>Token</th>
+                            <th>Waktu Masuk</th>
+                            <th>Status</th>
+                            <th>Progres</th>
+                            <th>Nilai Sementara</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+<script>
+    // === 1. DATA DUMMY (SIMULASI) ===
+    // Karena tidak ada database, kita buat data palsu
+    const names = ["Ahmad Dani", "Budi Santoso", "Citra Kirana", "Dedi Corbuzier", "Eka Gustiwana", "Fanny Fadillah", "Gading Marten", "Hesti Purwadinata", "Indro Warkop", "Joko Anwar"];
+    
+    let students = names.map((name, i) => ({
+        id: i + 1,
+        name: name,
+        token: "SD2025",
+        loginTime: "08:00:00",
+        status: "working", // working, done, offline
+        progress: Math.floor(Math.random() * 20), // 0-60 soal
+        score: 0
+    }));
+
+    // === 2. FUNGSI RENDER DASHBOARD ===
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        let countActive = 0;
+        let countDone = 0;
+        let totalScore = 0;
+
+        students.forEach((s, index) => {
+            let statusBadge = '';
+            let progressText = '';
+            let scoreText = '-';
+
+            if (s.status === 'working') {
+                statusBadge = '<span class="badge bg-blue">Mengerjakan</span>';
+                progressText = `${s.progress} / 60`;
+                scoreText = `<span style="color:#aaa;">(Hitung...)</span>`;
+                countActive++;
+            } else if (s.status === 'done') {
+                statusBadge = '<span class="badge bg-green">Selesai</span>';
+                progressText = '100%';
+                scoreText = `<strong>${s.score}</strong>`;
+                countDone++;
+                totalScore += s.score;
+            } else {
+                statusBadge = '<span class="badge bg-gray">Offline</span>';
+            }
+
+            const row = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><b>${s.name}</b></td>
+                    <td><code style="background:#eee; padding:2px 5px; border-radius:3px;">${s.token}</code></td>
+                    <td>${s.loginTime}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <div style="width:50px; height:6px; background:#eee; border-radius:3px;">
+                                <div style="width:${(s.progress/60)*100}%; height:100%; background:var(--primary); border-radius:3px;"></div>
+                            </div>
+                            <small>${progressText}</small>
+                        </div>
+                    </td>
+                    <td>${scoreText}</td>
+                    <td>
+                        <button class="btn btn-reset" onclick="resetSiswa('${s.name}')"><i class="fas fa-redo"></i> Reset</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+
+        // Update Kartu Statistik
+        document.getElementById('totalSiswa').innerText = students.length;
+        document.getElementById('activeSiswa').innerText = countActive;
+        document.getElementById('doneSiswa').innerText = countDone;
+        
+        const avg = countDone > 0 ? Math.round(totalScore / countDone) : 0;
+        document.getElementById('avgScore').innerText = avg;
+    }
+
+    // === 3. FUNGSI SIMULASI REALTIME (Agar terlihat hidup) ===
+    function startSimulation() {
+        setInterval(() => {
+            // Pilih satu siswa secara acak untuk diupdate
+            const randomIdx = Math.floor(Math.random() * students.length);
+            const student = students[randomIdx];
+
+            if (student.status === 'working') {
+                // Tambah progress
+                student.progress += 1;
+                
+                // Jika sudah 60 soal, tandai selesai
+                if (student.progress >= 60) {
+                    student.status = 'done';
+                    student.progress = 60;
+                    // Beri nilai acak antara 60 - 100
+                    student.score = Math.floor(Math.random() * (100 - 60 + 1)) + 60;
+                    // Play sound effect (optional) if needed
+                }
+            }
+            
+            renderTable(); // Refresh tampilan
+        }, 2000); // Update setiap 2 detik
+    }
+
+    // === 4. FUNGSI TOMBOL ===
+    function resetSiswa(nama) {
+        if(confirm(`Reset status ujian siswa atas nama ${nama}? Siswa harus login ulang.`)) {
+            const s = students.find(st => st.name === nama);
+            if(s) {
+                s.status = 'working';
+                s.progress = 0;
+                s.score = 0;
+                renderTable();
+            }
+        }
+    }
+
+    function exportData() {
+        alert("Mengunduh Laporan_Nilai_TKA.xlsx ...");
+        // Di aplikasi nyata, ini akan memicu download file
+    }
+
+    function refreshData() {
+        renderTable();
+    }
+
+    // INIT
+    renderTable();
+    startSimulation(); // Mulai simulasi data bergerak
+
+</script>
+</body>
+</html>
