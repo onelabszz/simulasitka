@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBT TKA SD 2025 - Full Version</title>
+    <title>CBT TKA SD 2025 - Final Fix</title>
     <style>
-        /* --- 1. CORE STYLING --- */
-        :root { --primary: #1565c0; --bg: #f4f6f9; --text: #2d3436; --success: #2e7d32; --warning: #f57f17; }
+        /* --- GAYA TAMPILAN (CSS) --- */
+        :root { --primary: #1565c0; --bg: #f2f4f8; --text: #2d3436; --success: #2e7d32; --warning: #f57f17; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text); }
         
@@ -16,11 +16,11 @@
             display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 20;
         }
-        .brand { font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .brand { font-weight: 800; font-size: 1.2rem; }
         .user-info { font-size: 0.9rem; opacity: 0.9; }
-        .timer-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold; font-family: monospace; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.4); }
+        .timer-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold; font-family: monospace; font-size: 1.2rem; }
 
-        /* LAYOUT CONTAINER */
+        /* LAYOUT UTAMA */
         .container { display: flex; flex: 1; overflow: hidden; }
         
         /* SIDEBAR NAVIGASI */
@@ -45,11 +45,11 @@
             font-weight: 600; color: #455a64; font-size: 0.9rem; transition: 0.2s;
         }
         .num-btn:hover { background: #e1f5fe; border-color: var(--primary); }
-        .num-btn.current { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .num-btn.current { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
         .num-btn.done { background: var(--success); color: white; border-color: #1b5e20; }
         .num-btn.flag { border: 2px solid var(--warning); color: var(--warning); font-weight: bold; }
 
-        /* MAIN CONTENT (SPLIT SCREEN) */
+        /* KONTEN SOAL (SPLIT SCREEN) */
         .main { flex: 1; display: flex; position: relative; }
         .pane-left {
             flex: 1; padding: 30px; overflow-y: auto; border-right: 2px solid #e0e0e0;
@@ -63,8 +63,7 @@
 
         .pane-right { flex: 1; padding: 30px; overflow-y: auto; background: #f8fbff; }
         .q-header { display: flex; gap: 10px; margin-bottom: 20px; }
-        .badge { padding: 4px 12px; border-radius: 4px; color: white; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
-        
+        .badge { padding: 4px 12px; border-radius: 4px; color: white; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
         .q-body { font-size: 1.1rem; font-weight: 500; margin-bottom: 25px; color: #2d3436; }
         
         /* OPSI JAWABAN */
@@ -78,7 +77,7 @@
         .opt input { margin-top: 4px; transform: scale(1.2); cursor: pointer; }
         .opt span { flex: 1; line-height: 1.4; }
 
-        /* TABEL PG KOMPLEKS (BENAR/SALAH) */
+        /* TABEL BENAR SALAH */
         .bs-table { width: 100%; background: white; border: 1px solid #cfd8dc; border-radius: 8px; border-collapse: separate; border-spacing: 0; overflow: hidden; }
         .bs-table th, .bs-table td { padding: 12px; border-bottom: 1px solid #eee; }
         .bs-table th { background: #eceff1; text-align: center; }
@@ -96,15 +95,13 @@
         .btn-prev { background: #90a4ae; }
         .btn-next { background: var(--primary); }
         .btn-end { background: var(--success); display: none; }
-        .btn:hover { opacity: 0.9; }
 
-        /* MODALS */
+        /* MODALS (Login & Result) */
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: none; justify-content: center; align-items: center; }
         .card { background: white; padding: 40px; border-radius: 12px; width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
         .input-box { margin: 15px 0; text-align: left; }
         .input-box label { font-weight: bold; display: block; margin-bottom: 5px; color: #555; }
         .input-box input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 6px; font-size: 1rem; }
-        .input-box input:focus { border-color: var(--primary); outline: none; }
         
         .score-circle { width: 120px; height: 120px; background: var(--primary); color: white; border-radius: 50%; font-size: 3rem; font-weight: 800; display: flex; justify-content: center; align-items: center; margin: 20px auto; border: 5px solid #bbdefb; }
         .score-detail { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
@@ -211,9 +208,7 @@
 </div>
 
 <script>
-    // === DATA SUMBER (STIMULUS & SOAL) ===
-    
-    // 1. Pustaka Bacaan (Sesuai PDF)
+    // === 1. DATABASE STIMULUS (BACAAN) ===
     const stimuli = {
         'S_FABEL': `<h3>Danau untuk Semua</h3><p>Di hutan ada sebuah danau tempat semua binatang minum. Suatu pagi, air danau menjadi kotor karena Rino si badak berendam di dalamnya. Binatang lain jadi tidak bisa minum. Namun, mereka takut menegur Rino karena badannya besar dan bercula. Mereka diam seribu bahasa.</p><p>Binatang hutan pun berkumpul. Hari si harimau mengusulkan agar meminta bantuan Ucil si kancil. Ucil menemui Rino dan berkata, "Tuan, ada makhluk gaib yang menutup jalan air." Rino percaya dan pergi mengecek. Saat itulah hewan lain bisa minum.</p>`,
         'S_FOLIVORA': `<h3>Hewan Pemakan Daun</h3><p>Hewan herbivora yang hanya makan daun disebut <strong>Folivora</strong>. Daun susah dicerna dan kadang mengandung racun. Tubuh hewan folivora punya cara khusus, yaitu usus yang panjang dan gerakan tubuh yang lambat untuk menghemat energi. Contohnya adalah Koala dan Panda.</p>`,
@@ -226,59 +221,63 @@
 
     let questions = [];
 
-    // 2. Generator Soal (Mengisi 60 Slot)
+    // === 2. GENERATOR SOAL ===
     function initQuestions() {
         // --- BAHASA INDONESIA (1-30) ---
-        // 6 Soal Asli PDF
+        // Soal Asli PDF
         questions.push(
-            [cite_start]{id:1, m:'BI', t:'PG', s:'S_FABEL', q:'Siapa yang memiliki usul untuk meminta bantuan hewan cerdik?', o:[{t:'Bani Kelinci',v:'A'},{t:'Ucil Kancil',v:'B'},{t:'Rino Badak',v:'C'},{t:'Hari Harimau',v:'D'}], k:'D'}, // [cite: 294-295]
-            {id:2, m:'BI', t:'PGK-BS', s:'S_FABEL', q:'Tentukan Sesuai/Tidak Sesuai perilaku tokoh!', r:[{t:'Rino mementingkan diri sendiri.',o:['Sesuai','Tidak Sesuai']},{t:'Hewan lain berani melawan Rino secara langsung.',o:['Sesuai','Tidak Sesuai']}], k:{0:'Sesuai',1:'Tidak Sesuai'}}, // Inferensi
-            [cite_start]{id:3, m:'BI', t:'PG', s:'S_FABEL', q:'Apa arti ungkapan "diam seribu bahasa"?', o:[{t:'Tidak mampu melakukan sesuatu',v:'A'},{t:'Menahan untuk tidak berkomentar',v:'B'},{t:'Tidak mau mendengar',v:'C'},{t:'Tidak tahu masalah',v:'D'}], k:'B'}, // [cite: 301]
-            {id:4, m:'BI', t:'PGK-M', s:'S_FOLIVORA', q:'Hewan apa saja yang termasuk Folivora? (Pilih >1)[cite_start]', o:[{t:'Sapi',v:'1'},{t:'Koala',v:'2'},{t:'Panda',v:'3'},{t:'Singa',v:'4'}], k:['2','3']}, // [cite: 335-337]
-            [cite_start]{id:5, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Bagan mana yang sesuai untuk teks tersebut?', o:[{t:'Pengertian -> Cara Mencerna -> Contoh',v:'A'},{t:'Contoh -> Pengertian -> Cara Mencerna',v:'B'},{t:'Cara Mencerna -> Contoh -> Pengertian',v:'C'},{t:'Tiga Kelompok -> Pengertian -> Cara Mencerna -> Contoh',v:'D'}], k:'D'}, // [cite: 361]
-            [cite_start]{id:6, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Gagasan utama paragraf ketiga adalah...', o:[{t:'Jenis daun',v:'A'},{t:'Pembagian hewan',v:'B'},{t:'Cara tubuh mencerna daun',v:'C'},{t:'Contoh hewan folivora',v:'D'}], k:'C'} // [cite: 378]
+            {id:1, m:'BI', t:'PG', s:'S_FABEL', q:'Siapa yang memiliki usul untuk meminta bantuan hewan cerdik?', o:[{t:'Bani Kelinci',v:'A'},{t:'Ucil Kancil',v:'B'},{t:'Rino Badak',v:'C'},{t:'Hari Harimau',v:'D'}], k:'D'},
+            {id:2, m:'BI', t:'PGK-BS', s:'S_FABEL', q:'Tentukan Sesuai/Tidak Sesuai perilaku tokoh!', r:[{t:'Rino mementingkan diri sendiri.',o:['Sesuai','Tidak Sesuai']},{t:'Hewan lain berani melawan Rino secara langsung.',o:['Sesuai','Tidak Sesuai']}], k:{0:'Sesuai',1:'Tidak Sesuai'}},
+            {id:3, m:'BI', t:'PG', s:'S_FABEL', q:'Apa arti ungkapan "diam seribu bahasa"?', o:[{t:'Tidak mampu melakukan sesuatu',v:'A'},{t:'Menahan untuk tidak berkomentar',v:'B'},{t:'Tidak mau mendengar',v:'C'},{t:'Tidak tahu masalah',v:'D'}], k:'B'},
+            {id:4, m:'BI', t:'PGK-M', s:'S_FOLIVORA', q:'Hewan apa saja yang termasuk Folivora? (Pilih >1)', o:[{t:'Sapi',v:'1'},{t:'Koala',v:'2'},{t:'Panda',v:'3'},{t:'Singa',v:'4'}], k:['2','3']},
+            {id:5, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Bagan mana yang sesuai untuk teks tersebut?', o:[{t:'Pengertian -> Cara Mencerna -> Contoh',v:'A'},{t:'Contoh -> Pengertian -> Cara Mencerna',v:'B'},{t:'Cara Mencerna -> Contoh -> Pengertian',v:'C'},{t:'Tiga Kelompok -> Pengertian -> Cara Mencerna -> Contoh',v:'D'}], k:'D'},
+            {id:6, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Gagasan utama paragraf ketiga adalah...', o:[{t:'Jenis daun',v:'A'},{t:'Pembagian hewan',v:'B'},{t:'Cara tubuh mencerna daun',v:'C'},{t:'Contoh hewan folivora',v:'D'}], k:'C'}
         );
-        // 24 Soal Filler BI
+        // Filler BI
         for(let i=7; i<=30; i++) {
             questions.push({id:i, m:'BI', t:'PG', s:'S_UMUM', q:`(Simulasi No.${i}) Sinonim kata "Efisien" adalah...`, o:[{t:'Boros',v:'A'},{t:'Tepat guna',v:'B'},{t:'Cepat',v:'C'},{t:'Lambat',v:'D'}], k:'B'});
         }
 
         // --- MATEMATIKA (31-60) ---
-        // 6 Soal Asli PDF
+        // Soal Asli PDF
         questions.push(
-            [cite_start]{id:31, m:'MTK', t:'PG', s:'S_UMUM', q:'Hasil dari 120% : 3 + 2 x 0,75 + 2/3 = ...', o:[{t:'11/30',v:'A'},{t:'49/60',v:'B'},{t:'31/30',v:'C'},{t:'98/60',v:'D'}], k:'A'}, // [cite: 383-395]
-            [cite_start]{id:32, m:'MTK', t:'PG', s:'S_DISKON', q:'Harga buku X + Z setelah diskon adalah...', o:[{t:'Rp18.000',v:'A'},{t:'Rp24.000',v:'B'},{t:'Rp27.000',v:'C'},{t:'Rp30.000',v:'D'}], k:'C'}, // [cite: 399-408]
-            {id:33, m:'MTK', t:'PGK-BS', s:'S_UMUM', q:'Pak Bondan punya 9 wadah susu (4.75 liter/wadah). [cite_start]Dibagi ke botol besar & kecil.', r:[{t:'Total produksi 42.75 liter',o:['Benar','Salah']},{t:'Isi botol kecil 57/74 liter',o:['Benar','Salah']}], k:{0:'Benar',1:'Benar'}}, // [cite: 410-417]
-            [cite_start]{id:34, m:'MTK', t:'PG', s:'S_DADU', q:'Jika sisi ATAS dadu 4, maka sisi BAWAH adalah...', o:[{t:'2',v:'A'},{t:'3',v:'B'},{t:'4',v:'C'},{t:'5',v:'D'}], k:'B'}, // [cite: 423-428]
-            [cite_start]{id:35, m:'MTK', t:'PGK-M', s:'S_SEMBAKO', q:'Pernyataan tentang berat sembako (Pilih >1)', o:[{t:'Total berat 4.425 gram',v:'1'},{t:'Berat mi instan > 0.5 kg',v:'2'},{t:'Gula pasir > Mi instan',v:'3'}], k:['1','3']}, // [cite: 432-439]
-            [cite_start]{id:36, m:'MTK', t:'PGK-BS', s:'S_DATA', q:'Analisis Data Pengunjung:', r:[{t:'Senin hanya 3/4 dari Rabu',o:['Benar','Salah']},{t:'Total pengunjung 100 orang',o:['Benar','Salah']}], k:{0:'Benar',1:'Salah'}} // [cite: 461-464]
+            {id:31, m:'MTK', t:'PG', s:'S_UMUM', q:'Hasil dari 120% : 3 + 2 x 0,75 + 2/3 = ...', o:[{t:'11/30',v:'A'},{t:'49/60',v:'B'},{t:'31/30',v:'C'},{t:'98/60',v:'D'}], k:'A'},
+            {id:32, m:'MTK', t:'PG', s:'S_DISKON', q:'Harga buku X + Z setelah diskon adalah...', o:[{t:'Rp18.000',v:'A'},{t:'Rp24.000',v:'B'},{t:'Rp27.000',v:'C'},{t:'Rp30.000',v:'D'}], k:'C'},
+            {id:33, m:'MTK', t:'PGK-BS', s:'S_UMUM', q:'Pak Bondan punya 9 wadah susu (4.75 liter/wadah). Dibagi ke botol besar & kecil.', r:[{t:'Total produksi 42.75 liter',o:['Benar','Salah']},{t:'Isi botol kecil 57/74 liter',o:['Benar','Salah']}], k:{0:'Benar',1:'Benar'}},
+            {id:34, m:'MTK', t:'PG', s:'S_DADU', q:'Jika sisi ATAS dadu 4, maka sisi BAWAH adalah...', o:[{t:'2',v:'A'},{t:'3',v:'B'},{t:'4',v:'C'},{t:'5',v:'D'}], k:'B'},
+            {id:35, m:'MTK', t:'PGK-M', s:'S_SEMBAKO', q:'Pernyataan tentang berat sembako (Pilih >1)', o:[{t:'Total berat 4.425 gram',v:'1'},{t:'Berat mi instan > 0.5 kg',v:'2'},{t:'Gula pasir > Mi instan',v:'3'}], k:['1','3']},
+            {id:36, m:'MTK', t:'PGK-BS', s:'S_DATA', q:'Analisis Data Pengunjung:', r:[{t:'Senin hanya 3/4 dari Rabu',o:['Benar','Salah']},{t:'Total pengunjung 100 orang',o:['Benar','Salah']}], k:{0:'Benar',1:'Salah'}}
         );
-        // 24 Soal Filler MTK
+        // Filler MTK
         for(let i=37; i<=60; i++) {
             questions.push({id:i, m:'MTK', t:'PG', s:'S_UMUM', q:`(Simulasi No.${i}) Keliling persegi dengan sisi ${i-30} cm adalah...`, o:[{t:`${(i-30)*4} cm`,v:'A'},{t:`${(i-30)*2} cm`,v:'B'},{t:'100 cm',v:'C'},{t:'10 cm',v:'D'}], k:'A'});
         }
     }
 
-    // === LOGIC ENGINE ===
+    // === 3. LOGIC ENGINE (FUNGSI UTAMA) ===
     let currentIdx = 0;
     let userAns = {}; 
     let flags = {};
     let timerRef;
 
+    // Fungsi Mulai Aplikasi
     function startApp() {
         const token = document.getElementById('tokenUjian').value.toUpperCase();
         if(token === 'SD2025' || token === 'ACAK') {
             document.getElementById('headerUser').innerText = "Peserta: " + (document.getElementById('namaPeserta').value || 'Siswa');
             
-            initQuestions();
+            initQuestions(); // Generate Soal
+            
             if(token === 'ACAK') shuffleOptions();
             
             renderGrid();
             loadQ(0);
             startTimer();
             
+            // Hilangkan Layer Login
             document.getElementById('loginModal').style.display = 'none';
         } else {
+            // Tampilkan Pesan Error
             document.getElementById('loginError').style.display = 'block';
         }
     }
@@ -297,6 +296,8 @@
     function renderGrid() {
         const gBI = document.getElementById('grid-BI');
         const gMTK = document.getElementById('grid-MTK');
+        gBI.innerHTML = ''; 
+        gMTK.innerHTML = '';
         
         questions.forEach((q, idx) => {
             const btn = document.createElement('div');
@@ -313,12 +314,13 @@
         currentIdx = idx;
         const q = questions[idx];
         
-        // 1. Setup Panel
+        // Setup Tampilan
         document.getElementById('stimulusBox').innerHTML = stimuli[q.s];
         document.getElementById('badgeMapel').innerText = q.m === 'BI' ? 'B. INDONESIA' : 'MATEMATIKA';
         document.getElementById('badgeMapel').style.background = q.m === 'BI' ? '#ef6c00' : '#1565c0';
-        
-        // 2. Render Soal
+        document.getElementById('badgeType').innerText = q.t.replace('PGK-','PG KOMPLEKS ');
+
+        // Render Soal
         let html = `<div class="q-body">No. ${q.id}. ${q.q}</div>`;
         
         if(q.t === 'PG') {
@@ -352,12 +354,10 @@
         
         document.getElementById('questionBox').innerHTML = html;
         
-        // 3. UI Updates
+        // UI Updates
         document.getElementById('checkRagu').checked = !!flags[idx];
-        
         updateNav();
         
-        // Button State
         document.getElementById('btnPrev').disabled = idx === 0;
         if(idx === questions.length - 1) {
             document.getElementById('btnNext').style.display = 'none';
@@ -367,23 +367,25 @@
             document.getElementById('btnEnd').style.display = 'none';
         }
 
-        // Auto Switch Tab
         if(q.m === 'BI') switchTab('BI'); else switchTab('MTK');
     }
 
-    // --- SAVING ---
+    // --- SAVING DATA ---
     function save(val) { userAns[currentIdx] = val; updateNav(); }
+    
     function saveMulti(el) {
         if(!userAns[currentIdx]) userAns[currentIdx] = [];
         if(el.checked) userAns[currentIdx].push(el.value);
         else userAns[currentIdx] = userAns[currentIdx].filter(x => x !== el.value);
         updateNav();
     }
+    
     function saveMtrx(r, val) {
         if(!userAns[currentIdx]) userAns[currentIdx] = {};
         userAns[currentIdx][r] = val;
         updateNav();
     }
+    
     function toggleFlag() {
         if(document.getElementById('checkRagu').checked) flags[currentIdx] = true; else delete flags[currentIdx];
         updateNav();
@@ -396,6 +398,7 @@
             if(id === currentIdx) b.classList.add('current');
             
             const a = userAns[id];
+            // Cek apakah sudah dijawab (support array/object/string)
             if(a && (Array.isArray(a) ? a.length>0 : (typeof a === 'object' ? Object.keys(a).length>0 : true))) {
                 b.classList.add('done');
             }
@@ -420,9 +423,9 @@
         if(n >= 0 && n < questions.length) loadQ(n);
     }
 
-    // --- SCORING ---
+    // --- SCORING & TIMER ---
     function finish() {
-        if(!confirm("Yakin selesai?")) return;
+        if(!confirm("Yakin selesai dan lihat nilai?")) return;
         clearInterval(timerRef);
         
         let sBI = 0, sMTK = 0;
@@ -432,6 +435,7 @@
             if(!a) return;
             
             let isCorrect = false;
+            // Logic Penilaian
             if(q.t === 'PG') {
                 if(a === q.k) isCorrect = true;
             } else if(q.t === 'PGK-M') {
@@ -464,7 +468,7 @@
         }, 1000);
     }
 
-    // Safety
+    // --- SAFETY PREVENT RELOAD ---
     window.onbeforeunload = function() {
         if(document.getElementById('resultModal').style.display !== 'flex') return "Yakin keluar?";
     };
