@@ -3,334 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBT TKA SD 2025 - Full 60 Soal</title>
+    <title>CBT TKA SD 2025 - Full Version</title>
     <style>
-        /* --- CSS ENGINE (Tampilan) --- */
-        :root { --primary: #1565c0; --accent: #ff6f00; --bg: #f2f4f8; --text: #2d3436; }
+        /* --- 1. CORE STYLING --- */
+        :root { --primary: #1565c0; --bg: #f4f6f9; --text: #2d3436; --success: #2e7d32; --warning: #f57f17; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text); }
         
         /* HEADER */
         header {
-            background: linear-gradient(135deg, var(--primary), #0d47a1); color: white; height: 65px;
-            display: flex; justify-content: space-between; align-items: center; padding: 0 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10;
+            background: linear-gradient(135deg, #0d47a1, #1976d2); color: white; height: 60px;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 20;
         }
-        .app-brand { display: flex; flex-direction: column; }
-        .app-title { font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px; }
-        .app-subtitle { font-size: 0.75rem; opacity: 0.9; }
-        .user-panel { display: flex; align-items: center; gap: 15px; }
-        .timer-box { background: rgba(255,255,255,0.2); padding: 6px 15px; border-radius: 20px; font-weight: bold; font-family: monospace; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.3); }
+        .brand { font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .user-info { font-size: 0.9rem; opacity: 0.9; }
+        .timer-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold; font-family: monospace; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.4); }
 
-        /* LAYOUT UTAMA */
+        /* LAYOUT CONTAINER */
         .container { display: flex; flex: 1; overflow: hidden; }
         
-        /* SIDEBAR (Navigasi Nomor) */
+        /* SIDEBAR NAVIGASI */
         .sidebar {
             width: 320px; background: white; border-right: 1px solid #e0e0e0;
-            display: flex; flex-direction: column; z-index: 5;
-            transition: transform 0.3s ease;
+            display: flex; flex-direction: column; z-index: 10;
         }
-        .mapel-tabs { display: flex; background: #e3f2fd; }
-        .tab-btn {
+        .tabs { display: flex; background: #e3f2fd; }
+        .tab {
             flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer;
             font-weight: 600; color: #546e7a; border-bottom: 3px solid transparent; transition: 0.2s;
         }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: white; }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: white; }
         
-        .nav-scroll { flex: 1; overflow-y: auto; padding: 15px; }
-        .nav-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; display: none; }
-        .nav-grid.active { display: grid; }
+        .nav-content { flex: 1; overflow-y: auto; padding: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; display: none; }
+        .grid.active { display: grid; }
         
-        .nav-item {
-            aspect-ratio: 1; border: 1px solid #cfd8dc; border-radius: 6px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; font-size: 0.9rem; font-weight: 600; color: #455a64;
-            background: white; transition: all 0.2s;
+        .num-btn {
+            aspect-ratio: 1; border: 1px solid #cfd8dc; border-radius: 6px; background: white;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            font-weight: 600; color: #455a64; font-size: 0.9rem; transition: 0.2s;
         }
-        .nav-item:hover { background: #e1f5fe; border-color: var(--primary); }
-        .nav-item.current { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .nav-item.answered { background: #43a047; color: white; border-color: #388e3c; }
-        .nav-item.flagged { border-color: #ffca28; border-width: 2px; }
+        .num-btn:hover { background: #e1f5fe; border-color: var(--primary); }
+        .num-btn.current { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .num-btn.done { background: var(--success); color: white; border-color: #1b5e20; }
+        .num-btn.flag { border: 2px solid var(--warning); color: var(--warning); font-weight: bold; }
 
-        /* SPLIT SCREEN (Kiri Bacaan, Kanan Soal) */
-        .content-area { flex: 1; display: flex; background: white; position: relative; }
-        .stimulus-panel {
-            flex: 1; padding: 30px; overflow-y: auto; border-right: 2px solid #f0f0f0;
-            background: #fff; max-width: 50%; min-width: 30%; font-size: 1rem; line-height: 1.7;
+        /* MAIN CONTENT (SPLIT SCREEN) */
+        .main { flex: 1; display: flex; position: relative; }
+        .pane-left {
+            flex: 1; padding: 30px; overflow-y: auto; border-right: 2px solid #e0e0e0;
+            background: white; max-width: 50%; font-size: 1.05rem; line-height: 1.6;
         }
-        .stimulus-panel h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.2rem; border-bottom: 2px solid #e3f2fd; padding-bottom: 8px; }
-        .stimulus-panel img { max-width: 100%; border-radius: 8px; margin: 10px 0; border: 1px solid #eee; }
-        .stimulus-panel table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9rem; }
-        .stimulus-panel th, .stimulus-panel td { border: 1px solid #ccc; padding: 8px; }
-        .stimulus-panel th { background: #f5f5f5; text-align: center; }
+        .pane-left h3 { color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid #bbdefb; padding-bottom: 5px; }
+        .pane-left p { margin-bottom: 15px; text-align: justify; }
+        .pane-left table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9rem; }
+        .pane-left th, .pane-left td { border: 1px solid #bdc3c7; padding: 8px; }
+        .pane-left th { background: #ecf0f1; text-align: center; }
 
-        .question-panel { flex: 1; padding: 30px; overflow-y: auto; background: #f8fbff; }
+        .pane-right { flex: 1; padding: 30px; overflow-y: auto; background: #f8fbff; }
+        .q-header { display: flex; gap: 10px; margin-bottom: 20px; }
+        .badge { padding: 4px 12px; border-radius: 4px; color: white; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        /* KOMPONEN SOAL */
-        .q-meta { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
-        .badge { padding: 4px 10px; border-radius: 4px; color: white; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
-        .badge-bi { background: #ef6c00; }
-        .badge-mtk { background: #1565c0; }
-        .badge-type { background: #78909c; }
-
-        .q-text { font-size: 1.15rem; font-weight: 500; margin-bottom: 25px; color: #263238; }
+        .q-body { font-size: 1.1rem; font-weight: 500; margin-bottom: 25px; color: #2d3436; }
         
         /* OPSI JAWABAN */
-        .opt-group { display: flex; flex-direction: column; gap: 12px; }
-        .opt-card {
-            display: flex; align-items: flex-start; gap: 12px; padding: 15px;
-            background: white; border: 1px solid #cfd8dc; border-radius: 8px;
-            cursor: pointer; transition: 0.2s; position: relative;
+        .opt-list { display: flex; flex-direction: column; gap: 12px; }
+        .opt {
+            display: flex; gap: 12px; padding: 15px; background: white;
+            border: 1px solid #cfd8dc; border-radius: 8px; cursor: pointer;
+            transition: 0.2s; align-items: flex-start;
         }
-        .opt-card:hover { border-color: var(--primary); background: #e3f2fd; }
-        .opt-card input { margin-top: 4px; transform: scale(1.3); }
-        .opt-label { flex: 1; line-height: 1.5; }
+        .opt:hover { border-color: var(--primary); background: #e3f2fd; }
+        .opt input { margin-top: 4px; transform: scale(1.2); cursor: pointer; }
+        .opt span { flex: 1; line-height: 1.4; }
 
         /* TABEL PG KOMPLEKS (BENAR/SALAH) */
-        .matrix-table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #cfd8dc; border-radius: 8px; overflow: hidden; background: white; }
-        .matrix-table th, .matrix-table td { padding: 12px; border-bottom: 1px solid #eee; }
-        .matrix-table th { background: #eceff1; font-weight: 600; text-align: center; }
-        .matrix-table td:first-child { border-right: 1px solid #eee; }
-        .matrix-table tr:last-child td { border-bottom: none; }
-        .check-cell { text-align: center; width: 15%; background: #fafafa; }
-        .check-cell input { transform: scale(1.3); cursor: pointer; }
+        .bs-table { width: 100%; background: white; border: 1px solid #cfd8dc; border-radius: 8px; border-collapse: separate; border-spacing: 0; overflow: hidden; }
+        .bs-table th, .bs-table td { padding: 12px; border-bottom: 1px solid #eee; }
+        .bs-table th { background: #eceff1; text-align: center; }
+        .bs-table td:first-child { border-right: 1px solid #eee; }
+        .center { text-align: center; width: 15%; background: #fafafa; }
 
-        /* FOOTER NAVIGASI */
+        /* FOOTER */
         footer {
             height: 70px; background: white; border-top: 1px solid #ddd;
             display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
         }
-        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        .btn-prev { background: #cfd8dc; color: #455a64; }
-        .btn-prev:hover { background: #b0bec5; }
-        .btn-next { background: var(--primary); color: white; }
-        .btn-next:hover { background: #0d47a1; }
-        .btn-finish { background: #2e7d32; color: white; display: none; }
-        .btn-finish:hover { background: #1b5e20; }
-        .ragu-check { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #f57f17; cursor: pointer; }
+        .ragu-box { display: flex; align-items: center; gap: 8px; font-weight: bold; color: var(--warning); cursor: pointer; }
+        .controls { display: flex; gap: 10px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-prev { background: #90a4ae; }
+        .btn-next { background: var(--primary); }
+        .btn-end { background: var(--success); display: none; }
+        .btn:hover { opacity: 0.9; }
 
-        /* LOGIN SCREEN */
-        .login-overlay { position: fixed; inset: 0; background: #e3f2fd; z-index: 999; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .login-header { text-align: center; margin-bottom: 30px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
-        .input-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 1rem; transition: 0.3s; }
-        .input-group input:focus { border-color: var(--primary); outline: none; }
-        .btn-start { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; }
-
-        /* RESULT MODAL */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; justify-content: center; align-items: center; animation: fadeIn 0.3s; }
-        .modal-content { background: white; width: 500px; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        .modal-header { background: var(--primary); color: white; padding: 20px; text-align: center; font-size: 1.2rem; font-weight: bold; }
-        .modal-body { padding: 30px; text-align: center; }
-        .score-big { font-size: 4rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
-        .score-details { display: flex; justify-content: space-around; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
-        .stat-item span { display: block; font-size: 0.9rem; color: #777; }
-        .stat-item strong { font-size: 1.2rem; color: #333; }
+        /* MODALS */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: none; justify-content: center; align-items: center; }
+        .card { background: white; padding: 40px; border-radius: 12px; width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .input-box { margin: 15px 0; text-align: left; }
+        .input-box label { font-weight: bold; display: block; margin-bottom: 5px; color: #555; }
+        .input-box input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 6px; font-size: 1rem; }
+        .input-box input:focus { border-color: var(--primary); outline: none; }
+        
+        .score-circle { width: 120px; height: 120px; background: var(--primary); color: white; border-radius: 50%; font-size: 3rem; font-weight: 800; display: flex; justify-content: center; align-items: center; margin: 20px auto; border: 5px solid #bbdefb; }
+        .score-detail { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
 
         @media (max-width: 768px) {
-            .content-area { flex-direction: column; }
-            .stimulus-panel { max-width: 100%; height: 35%; border-right: none; border-bottom: 2px solid #eee; }
-            .sidebar { position: absolute; height: 100%; transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .mobile-menu { display: block; font-size: 1.5rem; cursor: pointer; margin-right: 15px; }
+            .main { flex-direction: column; }
+            .pane-left { max-width: 100%; height: 35%; border-right: none; border-bottom: 2px solid #ddd; }
+            .sidebar { display: none; position: absolute; height: 100%; }
+            .sidebar.show { display: flex; }
+            .menu-toggle { display: block; cursor: pointer; font-size: 1.5rem; margin-right: 15px; }
         }
-        .mobile-menu { display: none; }
+        .menu-toggle { display: none; }
     </style>
 </head>
 <body>
 
-<div class="login-overlay" id="loginScreen">
-    <div class="login-box">
-        <div class="login-header">
-            <h2 style="color:var(--primary)">CBT TKA SD</h2>
-            <p>Simulasi Asesmen Nasional 2025</p>
-        </div>
-        <div class="input-group">
+<div class="overlay" id="loginModal" style="display:flex;">
+    <div class="card">
+        <h2 style="color:var(--primary); margin-bottom:10px;">LOGIN CBT</h2>
+        <p style="color:#666; margin-bottom:20px;">Tes Kemampuan Akademik SD</p>
+        
+        <div class="input-box">
             <label>Nama Peserta</label>
-            <input type="text" id="inputNama" placeholder="Masukkan Nama Lengkap">
+            <input type="text" id="namaPeserta" placeholder="Masukkan Nama Lengkap">
         </div>
-        <div class="input-group">
+        <div class="input-box">
             <label>Token Ujian</label>
-            <input type="text" id="inputToken" placeholder="Ketik: SD2025" style="text-transform:uppercase; letter-spacing: 2px; text-align:center;">
+            <input type="text" id="tokenUjian" placeholder="Contoh: SD2025" style="text-transform:uppercase; text-align:center; letter-spacing:2px;">
         </div>
-        <button class="btn-start" onclick="login()">MULAI UJIAN</button>
-        <p id="errorMsg" style="color:red; text-align:center; margin-top:10px; font-size:0.9rem; display:none;">Token Salah!</p>
-        <div style="margin-top:20px; background:#f5f5f5; padding:10px; border-radius:4px; font-size:0.8rem; text-align:center; color:#666;">
-            <strong>Token: SD2025</strong><br>
-            (Untuk Mode Soal Standar)<br>
-            <strong>Token: ACAK</strong><br>
-            (Untuk Mode Pilihan Ganda Diacak)
+        
+        <button class="btn btn-next" style="width:100%; margin-top:10px;" onclick="startApp()">MULAI UJIAN</button>
+        <p id="loginError" style="color:red; margin-top:10px; font-size:0.9rem; display:none;">Token Salah!</p>
+        
+        <div style="margin-top:20px; font-size:0.8rem; background:#f5f5f5; padding:10px; border-radius:6px; color:#555;">
+            Token Standar: <b>SD2025</b><br>
+            Token Acak: <b>ACAK</b>
         </div>
     </div>
 </div>
 
 <header>
     <div style="display:flex; align-items:center;">
-        <div class="mobile-menu" onclick="toggleSidebar()">☰</div>
-        <div class="app-brand">
-            <div class="app-title">SIMULASI TKA SD</div>
-            <div class="app-subtitle" id="userDisplay">Peserta: -</div>
-        </div>
+        <div class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('show')">☰</div>
+        <div class="brand">SIMULASI TKA</div>
     </div>
-    <div class="user-panel">
-        <div class="timer-box" id="timer">120:00</div>
-    </div>
+    <div class="user-info" id="headerUser">Peserta: -</div>
+    <div class="timer-badge" id="timer">120:00</div>
 </header>
 
 <div class="container">
     <nav class="sidebar" id="sidebar">
-        <div class="mapel-tabs">
-            <button class="tab-btn active" onclick="switchMapel('BI')">B. INDONESIA (1-30)</button>
-            <button class="tab-btn" onclick="switchMapel('MTK')">MATEMATIKA (31-60)</button>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('BI')">B. INDONESIA</button>
+            <button class="tab" onclick="switchTab('MTK')">MATEMATIKA</button>
         </div>
-        <div class="nav-scroll">
-            <div id="nav-BI" class="nav-grid active"></div> <div id="nav-MTK" class="nav-grid"></div> <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; font-size:0.8rem;">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
-                    <div style="width:12px; height:12px; background:var(--primary);"></div> Posisi Sekarang
-                </div>
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
-                    <div style="width:12px; height:12px; background:#43a047;"></div> Sudah Dijawab
-                </div>
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <div style="width:12px; height:12px; border:2px solid #ffca28;"></div> Ragu-ragu
-                </div>
-            </div>
+        <div class="nav-content">
+            <div id="grid-BI" class="grid active"></div>
+            <div id="grid-MTK" class="grid"></div>
         </div>
     </nav>
 
-    <main class="content-area">
-        <div class="stimulus-panel">
-            <div id="stimulus-container">
-                </div>
+    <main class="main">
+        <div class="pane-left">
+            <div id="stimulusBox"></div>
         </div>
 
-        <div class="question-panel">
-            <div class="q-meta">
-                <span class="badge badge-bi" id="badgeMapel">B. INDONESIA</span>
-                <span class="badge badge-type" id="badgeType">Pilihan Ganda</span>
+        <div class="pane-right">
+            <div class="q-header">
+                <span class="badge" id="badgeMapel" style="background:#ef6c00">B. INDONESIA</span>
+                <span class="badge" id="badgeType" style="background:#78909c">PG</span>
             </div>
-            <div id="question-container">
-                </div>
+            <div id="questionBox"></div>
         </div>
     </main>
 </div>
 
 <footer>
-    <label class="ragu-check">
-        <input type="checkbox" id="raguCheck" onchange="toggleRagu()"> Ragu-ragu
+    <label class="ragu-box">
+        <input type="checkbox" id="checkRagu" onchange="toggleFlag()"> Ragu-ragu
     </label>
-    <div style="display:flex; gap:10px;">
-        <button class="btn btn-prev" id="btnPrev" onclick="move(-1)">Sebelumnya</button>
-        <button class="btn btn-next" id="btnNext" onclick="move(1)">Selanjutnya</button>
-        <button class="btn btn-finish" id="btnFinish" onclick="finishExam()">Selesai Ujian</button>
+    <div class="controls">
+        <button class="btn btn-prev" id="btnPrev" onclick="nav(-1)">Sebelumnya</button>
+        <button class="btn btn-next" id="btnNext" onclick="nav(1)">Selanjutnya</button>
+        <button class="btn btn-end" id="btnEnd" onclick="finish()">Selesai</button>
     </div>
 </footer>
 
-<div class="modal" id="resultModal">
-    <div class="modal-content">
-        <div class="modal-header">HASIL SIMULASI TKA</div>
-        <div class="modal-body">
-            <p>Nilai Akhir Anda</p>
-            <div class="score-big" id="finalScore">0</div>
-            <div class="score-details">
-                <div class="stat-item">
-                    <span>Bahasa Indonesia</span>
-                    <strong id="scoreBI" style="color:#ef6c00">0/30</strong>
-                </div>
-                <div class="stat-item">
-                    <span>Matematika</span>
-                    <strong id="scoreMTK" style="color:#1565c0">0/30</strong>
-                </div>
+<div class="overlay" id="resultModal">
+    <div class="card">
+        <h2>HASIL UJIAN</h2>
+        <div class="score-circle" id="finalScore">0</div>
+        <div class="score-detail">
+            <div>
+                <span style="display:block; font-size:0.8rem; color:#777;">B. Indonesia</span>
+                <strong id="resBI" style="color:#ef6c00; font-size:1.2rem;">0/30</strong>
             </div>
-            <button class="btn btn-next" style="width:100%; margin-top:25px; justify-content:center;" onclick="location.reload()">Ulangi Tes</button>
+            <div>
+                <span style="display:block; font-size:0.8rem; color:#777;">Matematika</span>
+                <strong id="resMTK" style="color:#1565c0; font-size:1.2rem;">0/30</strong>
+            </div>
         </div>
+        <button class="btn btn-next" style="width:100%; margin-top:20px;" onclick="location.reload()">KELUAR</button>
     </div>
 </div>
 
 <script>
-    // === 1. DATABASE SOAL (SOURCE: DOKUMEN BSKAP + SIMULASI) ===
+    // === DATA SUMBER (STIMULUS & SOAL) ===
     
-    // Pustaka Bacaan (Stimulus) - Menghemat Memori
-    const stimulusDB = {
-        [cite_start]'S_DANAU': `<h3>Danau untuk Semua (Fiksi)</h3><p>Di hutan ada sebuah danau tempat semua binatang minum. Suatu pagi, air danau menjadi kotor karena Rino si badak berendam di dalamnya[cite: 270]. Binatang lain tidak berani menegur karena Rino besar dan bercula. Mereka diam seribu bahasa.</p><p>Kancil punya ide. Ia mendatangi Rino dan berkata, "Tuan, ada makhluk gaib yang menutup aliran air." Rino percaya dan pergi mengecek pohon nangka. Saat Rino pergi, hewan lain bisa minum sepuasnya.</p>`,
-        'S_FOLIVORA': `<h3>Hewan Pemakan Daun (Informasi)</h3><p>Hewan dibagi menjadi karnivora, herbivora, dan omnivora. [cite_start]Dari kelompok herbivora, ada hewan yang hanya makan daun saja, disebut <strong>Folivora</strong>[cite: 316]. Daun sulit dicerna, jadi hewan folivora punya usus panjang dan bergerak lambat. Contohnya adalah Koala dan Panda.</p>`,
-        'S_DISKON': `<h3>Toko Buku ABC (Bilangan)</h3><p>Menjelang tahun ajaran baru, Toko Buku ABC memberikan diskon 10% untuk semua buku. Harga awal buku:</p><ul><li>Buku Cerita (Y): Rp24.000,00</li><li>Buku Pelajaran (X): Setengah harga Buku Cerita</li><li>Kamus (Z): 0,75 kali harga Buku Cerita</li></ul>`,
-        'S_DADU': `<h3>Permainan Ular Tangga (Geometri)</h3><p>Mae melempar dadu. Diketahui jumlah titik pada dua sisi berlawanan pada dadu selalu berjumlah 7. Mae melempar dan sisi <strong>ATAS</strong> menunjukkan angka <strong>4</strong>.</p>`,
-        'S_DATA': `<h3>Pengunjung Perpustakaan (Data)</h3><p>Data pengunjung selama 5 hari:</p><table border="1" style="width:100%"><tr><th>Hari</th><th>Jml</th></tr><tr><td>Senin</td><td>15</td></tr><tr><td>Selasa</td><td>18</td></tr><tr><td>Rabu</td><td>20</td></tr><tr><td>Kamis</td><td>24</td></tr><tr><td>Jumat</td><td>20</td></tr></table>`,
-        'S_UMUM': `<div style="text-align:center; padding:50px; color:#888;"><i>Soal ini tidak menggunakan bacaan khusus. Silakan kerjakan langsung.</i></div>`
+    // 1. Pustaka Bacaan (Sesuai PDF)
+    const stimuli = {
+        'S_FABEL': `<h3>Danau untuk Semua</h3><p>Di hutan ada sebuah danau tempat semua binatang minum. Suatu pagi, air danau menjadi kotor karena Rino si badak berendam di dalamnya. Binatang lain jadi tidak bisa minum. Namun, mereka takut menegur Rino karena badannya besar dan bercula. Mereka diam seribu bahasa.</p><p>Binatang hutan pun berkumpul. Hari si harimau mengusulkan agar meminta bantuan Ucil si kancil. Ucil menemui Rino dan berkata, "Tuan, ada makhluk gaib yang menutup jalan air." Rino percaya dan pergi mengecek. Saat itulah hewan lain bisa minum.</p>`,
+        'S_FOLIVORA': `<h3>Hewan Pemakan Daun</h3><p>Hewan herbivora yang hanya makan daun disebut <strong>Folivora</strong>. Daun susah dicerna dan kadang mengandung racun. Tubuh hewan folivora punya cara khusus, yaitu usus yang panjang dan gerakan tubuh yang lambat untuk menghemat energi. Contohnya adalah Koala dan Panda.</p>`,
+        'S_DISKON': `<h3>Toko Buku ABC</h3><p>Menjelang tahun ajaran baru, Toko Buku ABC memberikan diskon <strong>10%</strong> untuk semua buku.</p><ul><li>Harga Buku Cerita (Y): Rp24.000,00</li><li>Harga Buku Pelajaran (X): Setengah dari harga Buku Cerita</li><li>Harga Kamus (Z): 0,75 kali harga Buku Cerita</li></ul>`,
+        'S_DADU': `<h3>Permainan Ular Tangga</h3><p>Mae melempar dadu. Diketahui jumlah titik pada dua sisi berlawanan pada dadu selalu berjumlah 7 (Contoh: 1 berlawanan dengan 6). Mae melempar dadu dan sisi <strong>ATAS</strong> menunjukkan angka <strong>4</strong>.</p>`,
+        'S_SEMBAKO': `<h3>Paket Sembako</h3><p>SD Harapan membagikan paket sembako berisi:</p><ul><li>3 kg beras</li><li>2 bungkus gula pasir (per bungkus 5 hg)</li><li>5 bungkus mi instan (per bungkus 85 g)</li></ul>`,
+        'S_DATA': `<h3>Data Pengunjung Perpustakaan</h3><p>Data 5 hari pertama:</p><table style="width:100%"><tr><th>Hari</th><th>Senin</th><th>Selasa</th><th>Rabu</th><th>Kamis</th><th>Jumat</th></tr><tr><td align="center">Jml</td><td align="center">15</td><td align="center">18</td><td align="center">20</td><td align="center">24</td><td align="center">20</td></tr></table>`,
+        'S_UMUM': `<div style="text-align:center; color:#888; padding:50px;"><i>Soal ini tidak menggunakan bacaan khusus. Silakan kerjakan langsung.</i></div>`
     };
 
-    // Array Soal (60 Butir)
     let questions = [];
 
-    // --- GENERATOR SOAL (Untuk mengisi slot 60 soal secara efisien) ---
-    function generateQuestions() {
-        // >> SOAL 1-10: BAHASA INDONESIA (Real Content from PDF)
+    // 2. Generator Soal (Mengisi 60 Slot)
+    function initQuestions() {
+        // --- BAHASA INDONESIA (1-30) ---
+        // 6 Soal Asli PDF
         questions.push(
-            {id:1, m:'BI', t:'PG', s:'S_DANAU', q:'Siapa yang memiliki usul meminta bantuan Kancil?', o:[{t:'Bani Kelinci',v:'A'},{t:'Hari Harimau',v:'B'},{t:'Rino Badak',v:'C'},{t:'Ucil Kancil',v:'D'}], k:'B'},
-            {id:2, m:'BI', t:'PGK-BS', s:'S_DANAU', q:'Tentukan Sesuai/Tidak Sesuai perilaku tokoh!', r:[{t:'Rino egois mementingkan diri sendiri.',o:['Sesuai','Tidak Sesuai']},{t:'Hewan lain berani melawan Rino langsung.',o:['Sesuai','Tidak Sesuai']}], k:{0:'Sesuai',1:'Tidak Sesuai'}},
-            {id:3, m:'BI', t:'PG', s:'S_DANAU', q:'Arti ungkapan "diam seribu bahasa" adalah...', o:[{t:'Tidak bisa bicara',v:'A'},{t:'Sangat takut dan tidak berkomentar',v:'B'},{t:'Sedang tidur',v:'C'},{t:'Banyak bicara',v:'D'}], k:'B'},
-            {id:4, m:'BI', t:'PGK-M', s:'S_FOLIVORA', q:'Pilih hewan yang termasuk Folivora! (Boleh lebih dari satu)[cite_start]', o:[{t:'Sapi',v:'1'},{t:'Koala',v:'2'},{t:'Panda',v:'3'},{t:'Singa',v:'4'}], k:['2','3']}, // [cite: 330]
-            {id:5, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Mengapa hewan Folivora bergerak lambat?', o:[{t:'Karena malas',v:'A'},{t:'Untuk menghemat energi mencerna daun',v:'B'},{t:'Karena kakinya pendek',v:'C'},{t:'Karena kekenyangan',v:'D'}], k:'B'},
-            {id:6, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Gagasan pokok paragraf pertama adalah...', o:[{t:'Jenis hewan pemakan daun',v:'A'},{t:'Pengertian karnivora',v:'B'},{t:'Cara koala tidur',v:'C'},{t:'Bahaya daun beracun',v:'D'}], k:'A'}
+            [cite_start]{id:1, m:'BI', t:'PG', s:'S_FABEL', q:'Siapa yang memiliki usul untuk meminta bantuan hewan cerdik?', o:[{t:'Bani Kelinci',v:'A'},{t:'Ucil Kancil',v:'B'},{t:'Rino Badak',v:'C'},{t:'Hari Harimau',v:'D'}], k:'D'}, // [cite: 294-295]
+            {id:2, m:'BI', t:'PGK-BS', s:'S_FABEL', q:'Tentukan Sesuai/Tidak Sesuai perilaku tokoh!', r:[{t:'Rino mementingkan diri sendiri.',o:['Sesuai','Tidak Sesuai']},{t:'Hewan lain berani melawan Rino secara langsung.',o:['Sesuai','Tidak Sesuai']}], k:{0:'Sesuai',1:'Tidak Sesuai'}}, // Inferensi
+            [cite_start]{id:3, m:'BI', t:'PG', s:'S_FABEL', q:'Apa arti ungkapan "diam seribu bahasa"?', o:[{t:'Tidak mampu melakukan sesuatu',v:'A'},{t:'Menahan untuk tidak berkomentar',v:'B'},{t:'Tidak mau mendengar',v:'C'},{t:'Tidak tahu masalah',v:'D'}], k:'B'}, // [cite: 301]
+            {id:4, m:'BI', t:'PGK-M', s:'S_FOLIVORA', q:'Hewan apa saja yang termasuk Folivora? (Pilih >1)[cite_start]', o:[{t:'Sapi',v:'1'},{t:'Koala',v:'2'},{t:'Panda',v:'3'},{t:'Singa',v:'4'}], k:['2','3']}, // [cite: 335-337]
+            [cite_start]{id:5, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Bagan mana yang sesuai untuk teks tersebut?', o:[{t:'Pengertian -> Cara Mencerna -> Contoh',v:'A'},{t:'Contoh -> Pengertian -> Cara Mencerna',v:'B'},{t:'Cara Mencerna -> Contoh -> Pengertian',v:'C'},{t:'Tiga Kelompok -> Pengertian -> Cara Mencerna -> Contoh',v:'D'}], k:'D'}, // [cite: 361]
+            [cite_start]{id:6, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Gagasan utama paragraf ketiga adalah...', o:[{t:'Jenis daun',v:'A'},{t:'Pembagian hewan',v:'B'},{t:'Cara tubuh mencerna daun',v:'C'},{t:'Contoh hewan folivora',v:'D'}], k:'C'} // [cite: 378]
         );
-        // Filler BI (7-30)
+        // 24 Soal Filler BI
         for(let i=7; i<=30; i++) {
-            questions.push({
-                id:i, m:'BI', t:'PG', s:'S_UMUM', 
-                q:`(Soal Simulasi No. ${i}) Kata baku dari 'Nasehat' adalah...`, 
-                o:[{t:'Nasihat',v:'A'},{t:'Nasehat',v:'B'},{t:'Nasihah',v:'C'},{t:'Nesehat',v:'D'}], k:'A'
-            });
+            questions.push({id:i, m:'BI', t:'PG', s:'S_UMUM', q:`(Simulasi No.${i}) Sinonim kata "Efisien" adalah...`, o:[{t:'Boros',v:'A'},{t:'Tepat guna',v:'B'},{t:'Cepat',v:'C'},{t:'Lambat',v:'D'}], k:'B'});
         }
 
-        // >> SOAL 31-40: MATEMATIKA (Real Content from PDF)
+        // --- MATEMATIKA (31-60) ---
+        // 6 Soal Asli PDF
         questions.push(
-            {id:31, m:'MTK', t:'PG', s:'S_UMUM', q:'Hasil dari 120% : 3 + 0,75 adalah...', o:[{t:'1,15',v:'A'},{t:'0,95',v:'B'},{t:'1,25',v:'C'},{t:'0,45',v:'D'}], k:'A'}, // 1.2/3 = 0.4 + 0.75 = 1.15
-            {id:32, m:'MTK', t:'PG', s:'S_DISKON', q:'Berapa harga Buku Pelajaran (X) sebelum diskon?', o:[{t:'Rp12.000',v:'A'},{t:'Rp24.000',v:'B'},{t:'Rp18.000',v:'C'},{t:'Rp6.000',v:'D'}], k:'A'}, // 24k / 2
-            {id:33, m:'MTK', t:'PG', s:'S_DISKON', q:'Harga Kamus (Z) setelah diskon 10% adalah...', o:[{t:'Rp16.200',v:'A'},{t:'Rp18.000',v:'B'},{t:'Rp20.000',v:'C'},{t:'Rp15.000',v:'D'}], k:'A'}, // Z=0.75*24=18k. Disc 10%=1.8k. 18-1.8=16.2k
-            [cite_start]{id:34, m:'MTK', t:'PG', s:'S_DADU', q:'Jika sisi ATAS dadu adalah 4, berapa titik di sisi BAWAH?', o:[{t:'2',v:'A'},{t:'3',v:'B'},{t:'4',v:'C'},{t:'5',v:'D'}], k:'B'}, // 7-4=3 [cite: 423]
-            {id:35, m:'MTK', t:'PGK-BS', s:'S_DATA', q:'Analisis Data Pengunjung:', r:[{t:'Pengunjung hari Senin adalah yang paling sedikit.',o:['Benar','Salah']},{t:'Total pengunjung Senin-Jumat adalah 100 orang.',o:['Benar','Salah']}], k:{0:'Benar',1:'Salah'}} // Total 97 (Salah)
+            [cite_start]{id:31, m:'MTK', t:'PG', s:'S_UMUM', q:'Hasil dari 120% : 3 + 2 x 0,75 + 2/3 = ...', o:[{t:'11/30',v:'A'},{t:'49/60',v:'B'},{t:'31/30',v:'C'},{t:'98/60',v:'D'}], k:'A'}, // [cite: 383-395]
+            [cite_start]{id:32, m:'MTK', t:'PG', s:'S_DISKON', q:'Harga buku X + Z setelah diskon adalah...', o:[{t:'Rp18.000',v:'A'},{t:'Rp24.000',v:'B'},{t:'Rp27.000',v:'C'},{t:'Rp30.000',v:'D'}], k:'C'}, // [cite: 399-408]
+            {id:33, m:'MTK', t:'PGK-BS', s:'S_UMUM', q:'Pak Bondan punya 9 wadah susu (4.75 liter/wadah). [cite_start]Dibagi ke botol besar & kecil.', r:[{t:'Total produksi 42.75 liter',o:['Benar','Salah']},{t:'Isi botol kecil 57/74 liter',o:['Benar','Salah']}], k:{0:'Benar',1:'Benar'}}, // [cite: 410-417]
+            [cite_start]{id:34, m:'MTK', t:'PG', s:'S_DADU', q:'Jika sisi ATAS dadu 4, maka sisi BAWAH adalah...', o:[{t:'2',v:'A'},{t:'3',v:'B'},{t:'4',v:'C'},{t:'5',v:'D'}], k:'B'}, // [cite: 423-428]
+            [cite_start]{id:35, m:'MTK', t:'PGK-M', s:'S_SEMBAKO', q:'Pernyataan tentang berat sembako (Pilih >1)', o:[{t:'Total berat 4.425 gram',v:'1'},{t:'Berat mi instan > 0.5 kg',v:'2'},{t:'Gula pasir > Mi instan',v:'3'}], k:['1','3']}, // [cite: 432-439]
+            [cite_start]{id:36, m:'MTK', t:'PGK-BS', s:'S_DATA', q:'Analisis Data Pengunjung:', r:[{t:'Senin hanya 3/4 dari Rabu',o:['Benar','Salah']},{t:'Total pengunjung 100 orang',o:['Benar','Salah']}], k:{0:'Benar',1:'Salah'}} // [cite: 461-464]
         );
-        // Filler MTK (36-60)
-        for(let i=36; i<=60; i++) {
-            questions.push({
-                id:i, m:'MTK', t:'PG', s:'S_UMUM', 
-                q:`(Soal Simulasi No. ${i}) Hasil dari 10 x ${i-30} + 5 adalah...`, 
-                o:[{t:`${10*(i-30)+5}`,v:'A'},{t:'100',v:'B'},{t:'50',v:'C'},{t:'0',v:'D'}], k:'A'
-            });
+        // 24 Soal Filler MTK
+        for(let i=37; i<=60; i++) {
+            questions.push({id:i, m:'MTK', t:'PG', s:'S_UMUM', q:`(Simulasi No.${i}) Keliling persegi dengan sisi ${i-30} cm adalah...`, o:[{t:`${(i-30)*4} cm`,v:'A'},{t:`${(i-30)*2} cm`,v:'B'},{t:'100 cm',v:'C'},{t:'10 cm',v:'D'}], k:'A'});
         }
     }
 
-    // === 2. ENGINE APLIKASI ===
+    // === LOGIC ENGINE ===
     let currentIdx = 0;
-    let userAns = {}; // Menyimpan jawaban { 0: 'A', 1: ['A','B'] }
-    let flagged = {}; // Ragu-ragu
-    let timerInterval;
+    let userAns = {}; 
+    let flags = {};
+    let timerRef;
 
-    function login() {
-        const token = document.getElementById('inputToken').value.toUpperCase();
+    function startApp() {
+        const token = document.getElementById('tokenUjian').value.toUpperCase();
         if(token === 'SD2025' || token === 'ACAK') {
-            document.getElementById('userDisplay').innerText = "Peserta: " + (document.getElementById('inputNama').value || 'Siswa');
-            generateQuestions(); // Generate 60 soal
+            document.getElementById('headerUser').innerText = "Peserta: " + (document.getElementById('namaPeserta').value || 'Siswa');
             
-            if(token === 'ACAK') shuffleOptions(); // Fitur Acak Opsi
+            initQuestions();
+            if(token === 'ACAK') shuffleOptions();
             
-            renderNav();
-            loadQuestion(0);
+            renderGrid();
+            loadQ(0);
             startTimer();
-            document.getElementById('loginScreen').style.display = 'none';
+            
+            document.getElementById('loginModal').style.display = 'none';
         } else {
-            document.getElementById('errorMsg').style.display = 'block';
+            document.getElementById('loginError').style.display = 'block';
         }
     }
 
     function shuffleOptions() {
         questions.forEach(q => {
             if(q.t === 'PG' || q.t === 'PGK-M') {
-                // Fisher-Yates shuffle
                 for (let i = q.o.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [q.o[i], q.o[j]] = [q.o[j], q.o[i]];
@@ -339,202 +294,180 @@
         });
     }
 
-    function renderNav() {
-        const navBI = document.getElementById('nav-BI');
-        const navMTK = document.getElementById('nav-MTK');
-        navBI.innerHTML = ''; navMTK.innerHTML = '';
-
+    function renderGrid() {
+        const gBI = document.getElementById('grid-BI');
+        const gMTK = document.getElementById('grid-MTK');
+        
         questions.forEach((q, idx) => {
             const btn = document.createElement('div');
-            btn.className = 'nav-item';
+            btn.className = 'num-btn';
             btn.id = `nav-${idx}`;
-            btn.innerText = idx + 1;
-            btn.onclick = () => loadQuestion(idx);
+            btn.innerText = q.id;
+            btn.onclick = () => loadQ(idx);
             
-            if(q.m === 'BI') navBI.appendChild(btn);
-            else navMTK.appendChild(btn);
+            if(q.m === 'BI') gBI.appendChild(btn); else gMTK.appendChild(btn);
         });
     }
 
-    function loadQuestion(idx) {
+    function loadQ(idx) {
         currentIdx = idx;
         const q = questions[idx];
-
-        // 1. Setup Tampilan
-        document.getElementById('stimulus-container').innerHTML = stimulusDB[q.s];
+        
+        // 1. Setup Panel
+        document.getElementById('stimulusBox').innerHTML = stimuli[q.s];
         document.getElementById('badgeMapel').innerText = q.m === 'BI' ? 'B. INDONESIA' : 'MATEMATIKA';
-        document.getElementById('badgeMapel').className = `badge ${q.m === 'BI' ? 'badge-bi' : 'badge-mtk'}`;
+        document.getElementById('badgeMapel').style.background = q.m === 'BI' ? '#ef6c00' : '#1565c0';
         
-        let typeText = "Pilihan Ganda";
-        if(q.t === 'PGK-M') typeText = "Pilihan Ganda Kompleks (Lebih dari satu)";
-        if(q.t === 'PGK-BS') typeText = "Menjodohkan / Benar-Salah";
-        document.getElementById('badgeType').innerText = typeText;
-
         // 2. Render Soal
-        let html = `<div class="q-text">No. ${q.id}. ${q.q}</div>`;
+        let html = `<div class="q-body">No. ${q.id}. ${q.q}</div>`;
         
-        // Render Opsi Berdasarkan Tipe
         if(q.t === 'PG') {
-            html += `<div class="opt-group">`;
+            html += `<div class="opt-list">`;
             q.o.forEach(opt => {
-                const checked = userAns[idx] === opt.v ? 'checked' : '';
-                html += `<label class="opt-card"><input type="radio" name="ans" value="${opt.v}" ${checked} onchange="saveAns('${opt.v}')"><span class="opt-label">${opt.t}</span></label>`;
+                const chk = userAns[idx] === opt.v ? 'checked' : '';
+                html += `<label class="opt"><input type="radio" name="ans" value="${opt.v}" ${chk} onchange="save('${opt.v}')"><span>${opt.t}</span></label>`;
             });
             html += `</div>`;
-        } 
-        else if(q.t === 'PGK-M') {
-            html += `<div class="opt-group">`;
+        } else if(q.t === 'PGK-M') {
+            html += `<div class="opt-list">`;
             q.o.forEach(opt => {
-                const isChecked = userAns[idx] && userAns[idx].includes(opt.v) ? 'checked' : '';
-                html += `<label class="opt-card"><input type="checkbox" value="${opt.v}" ${isChecked} onchange="saveMulti(this)"><span class="opt-label">${opt.t}</span></label>`;
+                const chk = userAns[idx] && userAns[idx].includes(opt.v) ? 'checked' : '';
+                html += `<label class="opt"><input type="checkbox" value="${opt.v}" ${chk} onchange="saveMulti(this)"><span>${opt.t}</span></label>`;
             });
             html += `</div>`;
-        }
-        else if(q.t === 'PGK-BS') {
-            html += `<table class="matrix-table"><thead><tr><th>Pernyataan</th>`;
+        } else if(q.t === 'PGK-BS') {
+            html += `<table class="bs-table"><thead><tr><th>Pernyataan</th>`;
             q.r[0].o.forEach(h => html += `<th>${h}</th>`);
             html += `</tr></thead><tbody>`;
             q.r.forEach((row, rI) => {
                 html += `<tr><td>${row.t}</td>`;
-                row.o.forEach(opt => {
-                    const checked = userAns[idx] && userAns[idx][rI] === opt ? 'checked' : '';
-                    html += `<td class="check-cell"><input type="radio" name="row${rI}" value="${opt}" ${checked} onchange="saveMatrix(${rI}, '${opt}')"></td>`;
+                row.o.forEach(op => {
+                    const chk = userAns[idx] && userAns[idx][rI] === op ? 'checked' : '';
+                    html += `<td class="center"><input type="radio" name="r${rI}" value="${op}" ${chk} onchange="saveMtrx(${rI},'${op}')"></td>`;
                 });
                 html += `</tr>`;
             });
             html += `</tbody></table>`;
         }
-
-        document.getElementById('question-container').innerHTML = html;
         
-        // 3. Update UI Navigasi
-        updateNavState();
+        document.getElementById('questionBox').innerHTML = html;
         
-        // Check Ragu-ragu
-        document.getElementById('raguCheck').checked = !!flagged[idx];
-
-        // Tombol Next/Prev/Finish
+        // 3. UI Updates
+        document.getElementById('checkRagu').checked = !!flags[idx];
+        
+        updateNav();
+        
+        // Button State
         document.getElementById('btnPrev').disabled = idx === 0;
         if(idx === questions.length - 1) {
             document.getElementById('btnNext').style.display = 'none';
-            document.getElementById('btnFinish').style.display = 'flex';
+            document.getElementById('btnEnd').style.display = 'block';
         } else {
-            document.getElementById('btnNext').style.display = 'flex';
-            document.getElementById('btnFinish').style.display = 'none';
+            document.getElementById('btnNext').style.display = 'block';
+            document.getElementById('btnEnd').style.display = 'none';
         }
 
-        // Auto Switch Sidebar Tab
-        if(q.m === 'BI') switchMapel('BI'); else switchMapel('MTK');
+        // Auto Switch Tab
+        if(q.m === 'BI') switchTab('BI'); else switchTab('MTK');
     }
 
-    // --- FUNGSI SIMPAN JAWABAN ---
-    function saveAns(val) { userAns[currentIdx] = val; updateNavState(); }
+    // --- SAVING ---
+    function save(val) { userAns[currentIdx] = val; updateNav(); }
     function saveMulti(el) {
         if(!userAns[currentIdx]) userAns[currentIdx] = [];
         if(el.checked) userAns[currentIdx].push(el.value);
-        else userAns[currentIdx] = userAns[currentIdx].filter(v => v !== el.value);
-        updateNavState();
+        else userAns[currentIdx] = userAns[currentIdx].filter(x => x !== el.value);
+        updateNav();
     }
-    function saveMatrix(row, val) {
+    function saveMtrx(r, val) {
         if(!userAns[currentIdx]) userAns[currentIdx] = {};
-        userAns[currentIdx][row] = val;
-        updateNavState();
+        userAns[currentIdx][r] = val;
+        updateNav();
     }
-    function toggleRagu() {
-        if(document.getElementById('raguCheck').checked) flagged[currentIdx] = true;
-        else delete flagged[currentIdx];
-        updateNavState();
+    function toggleFlag() {
+        if(document.getElementById('checkRagu').checked) flags[currentIdx] = true; else delete flags[currentIdx];
+        updateNav();
     }
 
-    function updateNavState() {
-        document.querySelectorAll('.nav-item').forEach(el => {
-            el.classList.remove('current', 'answered', 'flagged');
-            const id = parseInt(el.id.replace('nav-',''));
+    function updateNav() {
+        document.querySelectorAll('.num-btn').forEach(b => {
+            const id = parseInt(b.id.split('-')[1]);
+            b.className = 'num-btn';
+            if(id === currentIdx) b.classList.add('current');
             
-            if(id === currentIdx) el.classList.add('current');
-            
-            // Cek sudah dijawab?
-            const ans = userAns[id];
-            let isAns = false;
-            if(ans) {
-                if(Array.isArray(ans)) isAns = ans.length > 0;
-                else if(typeof ans === 'object') isAns = Object.keys(ans).length > 0;
-                else isAns = true;
+            const a = userAns[id];
+            if(a && (Array.isArray(a) ? a.length>0 : (typeof a === 'object' ? Object.keys(a).length>0 : true))) {
+                b.classList.add('done');
             }
-            if(isAns) el.classList.add('answered');
-            if(flagged[id]) el.classList.add('flagged');
+            if(flags[id]) b.classList.add('flag');
         });
     }
 
-    function switchMapel(mapel) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.nav-grid').forEach(g => g.classList.remove('active'));
-        
-        if(mapel === 'BI') {
-            document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
-            document.getElementById('nav-BI').classList.add('active');
+    function switchTab(t) {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.grid').forEach(g => g.classList.remove('active'));
+        if(t === 'BI') {
+            document.querySelector('.tab:nth-child(1)').classList.add('active');
+            document.getElementById('grid-BI').classList.add('active');
         } else {
-            document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
-            document.getElementById('nav-MTK').classList.add('active');
+            document.querySelector('.tab:nth-child(2)').classList.add('active');
+            document.getElementById('grid-MTK').classList.add('active');
         }
     }
     
-    function move(step) {
-        const next = currentIdx + step;
-        if(next >= 0 && next < questions.length) loadQuestion(next);
+    function nav(step) {
+        const n = currentIdx + step;
+        if(n >= 0 && n < questions.length) loadQ(n);
     }
 
-    // --- SISTEM SKOR ---
-    function finishExam() {
-        if(!confirm("Yakin ingin menyelesaikan ujian?")) return;
-        clearInterval(timerInterval);
-
+    // --- SCORING ---
+    function finish() {
+        if(!confirm("Yakin selesai?")) return;
+        clearInterval(timerRef);
+        
         let sBI = 0, sMTK = 0;
         
         questions.forEach((q, i) => {
-            let correct = false;
             const a = userAns[i];
+            if(!a) return;
             
-            if(!a) return; // Skip if empty
-
+            let isCorrect = false;
             if(q.t === 'PG') {
-                if(a === q.k) correct = true;
+                if(a === q.k) isCorrect = true;
             } else if(q.t === 'PGK-M') {
-                if(a.length === q.k.length && a.sort().toString() === q.k.sort().toString()) correct = true;
+                if(a.length === q.k.length && a.sort().toString() === q.k.sort().toString()) isCorrect = true;
             } else if(q.t === 'PGK-BS') {
                 let match = true;
                 if(Object.keys(a).length !== Object.keys(q.k).length) match = false;
-                for(let r in q.k) if(a[r] !== q.k[r]) match = false;
-                if(match) correct = true;
+                for(let k in q.k) if(a[k] !== q.k[k]) match = false;
+                if(match) isCorrect = true;
             }
-
-            if(correct) {
-                if(q.m === 'BI') sBI++; else sMTK++;
-            }
+            
+            if(isCorrect) { if(q.m === 'BI') sBI++; else sMTK++; }
         });
-
+        
         const final = Math.round(((sBI + sMTK) / 60) * 100);
         document.getElementById('finalScore').innerText = final;
-        document.getElementById('scoreBI').innerText = `${sBI}/30`;
-        document.getElementById('scoreMTK').innerText = `${sMTK}/30`;
+        document.getElementById('resBI').innerText = `${sBI}/30`;
+        document.getElementById('resMTK').innerText = `${sMTK}/30`;
         document.getElementById('resultModal').style.display = 'flex';
     }
 
     function startTimer() {
-        let t = 120 * 60; // 120 Menit
-        timerInterval = setInterval(() => {
+        let t = 7200; // 120 menit
+        timerRef = setInterval(() => {
             t--;
             const m = Math.floor(t/60).toString().padStart(2,'0');
             const s = (t%60).toString().padStart(2,'0');
             document.getElementById('timer').innerText = `${m}:${s}`;
-            if(t <= 0) { finishExam(); clearInterval(timerInterval); alert("Waktu Habis!"); }
+            if(t<=0) { finish(); clearInterval(timerRef); }
         }, 1000);
     }
 
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-    }
+    // Safety
+    window.onbeforeunload = function() {
+        if(document.getElementById('resultModal').style.display !== 'flex') return "Yakin keluar?";
+    };
 </script>
-
 </body>
 </html>
