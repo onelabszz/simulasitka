@@ -6,7 +6,7 @@
     <title>CBT TKA SD 2025 - Mobile Friendly</title>
     <style>
         /* --- 1. CSS SYSTEM (RESPONSIVE) --- */
-        :root { --primary: #0d47a1; --accent: #1976d2; --bg: #f4f7f6; --text: #333; --success: #2e7d32; --warning: #ff8f00; }
+        :root { --primary: #0d47a1; --accent: #1976d2; --bg: #f4f7f6; --text: #333; --success: #2e7d32; --warning: #ff8f00; --info: #0288d1; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
         body { background: var(--bg); height: 100vh; display: flex; flex-direction: column; color: var(--text); overflow: hidden; }
 
@@ -36,11 +36,16 @@
         
         .num-box {
             aspect-ratio: 1; border: 1px solid #ccc; border-radius: 4px; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; font-weight: bold; font-size: 0.9rem; background: white; color: #555;
+            cursor: pointer; font-weight: bold; font-size: 0.9rem; background: white; color: #555; position: relative;
         }
         .num-box.current { background: var(--primary); color: white; border-color: var(--primary); }
+        /* Indikator Visual Terjawab */
         .num-box.done { background: var(--success); color: white; border-color: var(--success); }
+        .num-box.done::after { content: '✓'; position: absolute; top: 1px; right: 2px; font-size: 0.65rem; line-height: 1; }
+        
         .num-box.flag { border: 2px solid var(--warning); color: var(--warning); }
+        /* Override flag jika done agar tetap terlihat border kuning tapi background hijau */
+        .num-box.done.flag { border: 2px solid var(--warning); background: var(--success); color: white; }
 
         /* AREA SOAL (Split Screen) */
         .main-content { flex: 1; display: flex; overflow: hidden; }
@@ -55,7 +60,7 @@
         .panel-read th, .panel-read td { border: 1px solid #ccc; padding: 5px; }
         
         /* Panel Kanan (Pertanyaan) */
-        .panel-question { flex: 1; padding: 20px; overflow-y: auto; background: #f9fbff; }
+        .panel-question { flex: 1; padding: 20px; overflow-y: auto; background: #f9fbff; display: flex; flex-direction: column; }
         .q-badges { display: flex; gap: 8px; margin-bottom: 15px; }
         .badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; color: white; font-weight: bold; text-transform: uppercase; }
         .q-text { font-size: 1.1rem; font-weight: 500; margin-bottom: 20px; line-height: 1.5; }
@@ -76,6 +81,13 @@
         .matrix td:first-child { text-align: left; border-right: 1px solid #eee; }
         .matrix th { background: #eceff1; }
 
+        /* FEEDBACK CEK JAWABAN */
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 8px; font-weight: 500; font-size: 0.95rem; display: none; animation: fadeIn 0.3s; }
+        .feedback.correct { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        .feedback.wrong { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+        .feedback ul { margin-left: 20px; margin-top: 5px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
         /* FOOTER NAVIGASI */
         footer {
             height: 60px; background: white; border-top: 1px solid #ddd; padding: 0 15px;
@@ -88,6 +100,7 @@
         }
         .btn-prev { background: #90a4ae; }
         .btn-next { background: var(--primary); }
+        .btn-check { background: var(--info); }
         .btn-finish { background: var(--success); display: none; }
 
         /* --- MOBILE RESPONSIVE TWEAKS --- */
@@ -175,6 +188,8 @@
                 <span class="badge" id="badgeType" style="background:#78909c">Tipe</span>
             </div>
             <div id="questionBox"></div>
+            <!-- Area Feedback Cek Jawaban -->
+            <div id="feedbackArea" class="feedback"></div>
         </div>
     </main>
 </div>
@@ -184,6 +199,7 @@
         <input type="checkbox" id="raguCheck" onchange="toggleFlag()"> Ragu
     </label>
     <div class="nav-buttons">
+        <button class="btn btn-check" onclick="checkCurrentAnswer()">CEK</button>
         <button class="btn btn-prev" id="btnPrev" onclick="nav(-1)"> < </button>
         <button class="btn btn-next" id="btnNext" onclick="nav(1)"> > </button>
         <button class="btn btn-finish" id="btnEnd" onclick="finishExam()">KIRIM</button>
@@ -313,6 +329,11 @@
         bgM.style.background = q.m==='BI'?'#ef6c00':'#1565c0';
         document.getElementById('badgeType').innerText = q.t;
 
+        // Reset Feedback
+        const fb = document.getElementById('feedbackArea');
+        fb.style.display = 'none';
+        fb.className = 'feedback';
+
         // Render Soal
         let h = `<div class="q-text">No.${q.id}. ${q.q}</div>`;
         if(q.t === 'PG') {
@@ -361,8 +382,80 @@
         if(q.m==='BI') swTab('BI'); else swTab('MTK');
     }
 
+    // CEK JAWABAN FEATURE
+    function checkCurrentAnswer() {
+        const q = questions[idx];
+        const a = ans[idx];
+        const fb = document.getElementById('feedbackArea');
+        
+        // Cek jika belum dijawab
+        if(!a || (Array.isArray(a) && a.length===0) || (typeof a==='object' && Object.keys(a).length===0)) {
+            alert("Silakan pilih jawaban terlebih dahulu sebelum mengecek!");
+            return;
+        }
+
+        let isCorrect = false;
+        let correctInfo = "";
+
+        if(q.t === 'PG') {
+            isCorrect = (a === q.k);
+            if(!isCorrect) {
+                const kOpt = q.o.find(opt => opt.v === q.k);
+                correctInfo = kOpt ? `Kunci: <b>${kOpt.v}. ${kOpt.t}</b>` : `Kunci: ${q.k}`;
+            }
+        } 
+        else if (q.t === 'PGK-M') {
+            const userS = [...a].sort().join(',');
+            const keyS = [...q.k].sort().join(',');
+            isCorrect = (userS === keyS);
+            if(!isCorrect) {
+                const corrOpts = q.o.filter(opt => q.k.includes(opt.v)).map(o => o.t).join(', ');
+                correctInfo = `Kunci: <b>${corrOpts}</b>`;
+            }
+        } 
+        else if (q.t === 'PGK-BS') {
+            let allMatch = true;
+            if(Object.keys(a).length !== Object.keys(q.k).length) allMatch = false;
+            for(let row in q.k) {
+                if(a[row] !== q.k[row]) allMatch = false;
+            }
+            isCorrect = allMatch;
+            if(!isCorrect) {
+                let list = "<ul>";
+                for(let rIdx in q.k) {
+                    list += `<li>${q.r[rIdx].t}: <b>${q.k[rIdx]}</b></li>`;
+                }
+                list += "</ul>";
+                correctInfo = `Kunci: ${list}`;
+            }
+        }
+
+        fb.style.display = 'block';
+        if(isCorrect) {
+            fb.className = 'feedback correct';
+            fb.innerHTML = `✅ Jawaban kamu <b>BENAR</b>!`;
+        } else {
+            fb.className = 'feedback wrong';
+            fb.innerHTML = `❌ Jawaban kamu <b>SALAH</b>.<br><div style="margin-top:5px; font-size:0.9rem; color:#333;">${correctInfo}</div>`;
+        }
+        
+        // Scroll ke feedback agar terlihat
+        fb.scrollIntoView({behavior: "smooth", block: "end"});
+    }
+
     // SAVING
-    function sv(v) { ans[idx] = v; updNav(); }
+    function sv(v) { 
+        ans[idx] = v; 
+        updNav(); 
+        
+        // Auto Next (300ms)
+        if (idx < questions.length - 1) {
+            setTimeout(function() {
+                nav(1);
+            }, 300);
+        }
+    }
+
     function svMul(e) {
         if(!ans[idx]) ans[idx]=[];
         if(e.checked) ans[idx].push(e.value);
@@ -384,6 +477,7 @@
             b.className = 'num-box';
             if(id===idx) b.classList.add('current');
             const a = ans[id];
+            // Indikator visual lebih jelas (Done)
             if(a && (Array.isArray(a)?a.length>0:(typeof a==='object'?Object.keys(a).length>0:true))) b.classList.add('done');
             if(flags[id]) b.classList.add('flag');
         });
