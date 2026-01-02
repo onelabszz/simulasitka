@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT TKA SD 2025 - Final Fix</title>
+    <style>
+        /* --- GAYA TAMPILAN (CSS) --- */
+        :root { --primary: #1565c0; --bg: #f2f4f8; --text: #2d3436; --success: #2e7d32; --warning: #f57f17; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text); }
+        
+        /* HEADER */
+        header {
+            background: linear-gradient(135deg, #0d47a1, #1976d2); color: white; height: 60px;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 20;
+        }
+        .brand { font-weight: 800; font-size: 1.2rem; }
+        .user-info { font-size: 0.9rem; opacity: 0.9; }
+        .timer-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold; font-family: monospace; font-size: 1.2rem; }
+
+        /* LAYOUT UTAMA */
+        .container { display: flex; flex: 1; overflow: hidden; }
+        
+        /* SIDEBAR NAVIGASI */
+        .sidebar {
+            width: 320px; background: white; border-right: 1px solid #e0e0e0;
+            display: flex; flex-direction: column; z-index: 10;
+        }
+        .tabs { display: flex; background: #e3f2fd; }
+        .tab {
+            flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer;
+            font-weight: 600; color: #546e7a; border-bottom: 3px solid transparent; transition: 0.2s;
+        }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: white; }
+        
+        .nav-content { flex: 1; overflow-y: auto; padding: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; display: none; }
+        .grid.active { display: grid; }
+        
+        .num-btn {
+            aspect-ratio: 1; border: 1px solid #cfd8dc; border-radius: 6px; background: white;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            font-weight: 600; color: #455a64; font-size: 0.9rem; transition: 0.2s;
+        }
+        .num-btn:hover { background: #e1f5fe; border-color: var(--primary); }
+        .num-btn.current { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+        .num-btn.done { background: var(--success); color: white; border-color: #1b5e20; }
+        .num-btn.flag { border: 2px solid var(--warning); color: var(--warning); font-weight: bold; }
+
+        /* KONTEN SOAL (SPLIT SCREEN) */
+        .main { flex: 1; display: flex; position: relative; }
+        .pane-left {
+            flex: 1; padding: 30px; overflow-y: auto; border-right: 2px solid #e0e0e0;
+            background: white; max-width: 50%; font-size: 1.05rem; line-height: 1.6;
+        }
+        .pane-left h3 { color: var(--primary); margin-bottom: 15px; border-bottom: 2px solid #bbdefb; padding-bottom: 5px; }
+        .pane-left p { margin-bottom: 15px; text-align: justify; }
+        .pane-left table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9rem; }
+        .pane-left th, .pane-left td { border: 1px solid #bdc3c7; padding: 8px; }
+        .pane-left th { background: #ecf0f1; text-align: center; }
+
+        .pane-right { flex: 1; padding: 30px; overflow-y: auto; background: #f8fbff; }
+        .q-header { display: flex; gap: 10px; margin-bottom: 20px; }
+        .badge { padding: 4px 12px; border-radius: 4px; color: white; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .q-body { font-size: 1.1rem; font-weight: 500; margin-bottom: 25px; color: #2d3436; }
+        
+        /* OPSI JAWABAN */
+        .opt-list { display: flex; flex-direction: column; gap: 12px; }
+        .opt {
+            display: flex; gap: 12px; padding: 15px; background: white;
+            border: 1px solid #cfd8dc; border-radius: 8px; cursor: pointer;
+            transition: 0.2s; align-items: flex-start;
+        }
+        .opt:hover { border-color: var(--primary); background: #e3f2fd; }
+        .opt input { margin-top: 4px; transform: scale(1.2); cursor: pointer; }
+        .opt span { flex: 1; line-height: 1.4; }
+
+        /* TABEL BENAR SALAH */
+        .bs-table { width: 100%; background: white; border: 1px solid #cfd8dc; border-radius: 8px; border-collapse: separate; border-spacing: 0; overflow: hidden; }
+        .bs-table th, .bs-table td { padding: 12px; border-bottom: 1px solid #eee; }
+        .bs-table th { background: #eceff1; text-align: center; }
+        .bs-table td:first-child { border-right: 1px solid #eee; }
+        .center { text-align: center; width: 15%; background: #fafafa; }
+
+        /* FOOTER */
+        footer {
+            height: 70px; background: white; border-top: 1px solid #ddd;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
+        }
+        .ragu-box { display: flex; align-items: center; gap: 8px; font-weight: bold; color: var(--warning); cursor: pointer; }
+        .controls { display: flex; gap: 10px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-prev { background: #90a4ae; }
+        .btn-next { background: var(--primary); }
+        .btn-end { background: var(--success); display: none; }
+
+        /* MODALS (Login & Result) */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: none; justify-content: center; align-items: center; }
+        .card { background: white; padding: 40px; border-radius: 12px; width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .input-box { margin: 15px 0; text-align: left; }
+        .input-box label { font-weight: bold; display: block; margin-bottom: 5px; color: #555; }
+        .input-box input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 6px; font-size: 1rem; }
+        
+        .score-circle { width: 120px; height: 120px; background: var(--primary); color: white; border-radius: 50%; font-size: 3rem; font-weight: 800; display: flex; justify-content: center; align-items: center; margin: 20px auto; border: 5px solid #bbdefb; }
+        .score-detail { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
+
+        @media (max-width: 768px) {
+            .main { flex-direction: column; }
+            .pane-left { max-width: 100%; height: 35%; border-right: none; border-bottom: 2px solid #ddd; }
+            .sidebar { display: none; position: absolute; height: 100%; }
+            .sidebar.show { display: flex; }
+            .menu-toggle { display: block; cursor: pointer; font-size: 1.5rem; margin-right: 15px; }
+        }
+        .menu-toggle { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="loginModal" style="display:flex;">
+    <div class="card">
+        <h2 style="color:var(--primary); margin-bottom:10px;">LOGIN CBT</h2>
+        <p style="color:#666; margin-bottom:20px;">Tes Kemampuan Akademik SD</p>
+        
+        <div class="input-box">
+            <label>Nama Peserta</label>
+            <input type="text" id="namaPeserta" placeholder="Masukkan Nama Lengkap">
+        </div>
+        <div class="input-box">
+            <label>Token Ujian</label>
+            <input type="text" id="tokenUjian" placeholder="Contoh: SD2025" style="text-transform:uppercase; text-align:center; letter-spacing:2px;">
+        </div>
+        
+        <button class="btn btn-next" style="width:100%; margin-top:10px;" onclick="startApp()">MULAI UJIAN</button>
+        <p id="loginError" style="color:red; margin-top:10px; font-size:0.9rem; display:none;">Token Salah!</p>
+        
+        <div style="margin-top:20px; font-size:0.8rem; background:#f5f5f5; padding:10px; border-radius:6px; color:#555;">
+            Token Standar: <b>SD2025</b><br>
+            Token Acak: <b>ACAK</b>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div style="display:flex; align-items:center;">
+        <div class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('show')">☰</div>
+        <div class="brand">SIMULASI TKA</div>
+    </div>
+    <div class="user-info" id="headerUser">Peserta: -</div>
+    <div class="timer-badge" id="timer">120:00</div>
+</header>
+
+<div class="container">
+    <nav class="sidebar" id="sidebar">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('BI')">B. INDONESIA</button>
+            <button class="tab" onclick="switchTab('MTK')">MATEMATIKA</button>
+        </div>
+        <div class="nav-content">
+            <div id="grid-BI" class="grid active"></div>
+            <div id="grid-MTK" class="grid"></div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="pane-left">
+            <div id="stimulusBox"></div>
+        </div>
+
+        <div class="pane-right">
+            <div class="q-header">
+                <span class="badge" id="badgeMapel" style="background:#ef6c00">B. INDONESIA</span>
+                <span class="badge" id="badgeType" style="background:#78909c">PG</span>
+            </div>
+            <div id="questionBox"></div>
+        </div>
+    </main>
+</div>
+
+<footer>
+    <label class="ragu-box">
+        <input type="checkbox" id="checkRagu" onchange="toggleFlag()"> Ragu-ragu
+    </label>
+    <div class="controls">
+        <button class="btn btn-prev" id="btnPrev" onclick="nav(-1)">Sebelumnya</button>
+        <button class="btn btn-next" id="btnNext" onclick="nav(1)">Selanjutnya</button>
+        <button class="btn btn-end" id="btnEnd" onclick="finish()">Selesai</button>
+    </div>
+</footer>
+
+<div class="overlay" id="resultModal">
+    <div class="card">
+        <h2>HASIL UJIAN</h2>
+        <div class="score-circle" id="finalScore">0</div>
+        <div class="score-detail">
+            <div>
+                <span style="display:block; font-size:0.8rem; color:#777;">B. Indonesia</span>
+                <strong id="resBI" style="color:#ef6c00; font-size:1.2rem;">0/30</strong>
+            </div>
+            <div>
+                <span style="display:block; font-size:0.8rem; color:#777;">Matematika</span>
+                <strong id="resMTK" style="color:#1565c0; font-size:1.2rem;">0/30</strong>
+            </div>
+        </div>
+        <button class="btn btn-next" style="width:100%; margin-top:20px;" onclick="location.reload()">KELUAR</button>
+    </div>
+</div>
+
+<script>
+    // === 1. DATABASE STIMULUS (BACAAN) ===
+    const stimuli = {
+        'S_FABEL': `<h3>Danau untuk Semua</h3><p>Di hutan ada sebuah danau tempat semua binatang minum. Suatu pagi, air danau menjadi kotor karena Rino si badak berendam di dalamnya. Binatang lain jadi tidak bisa minum. Namun, mereka takut menegur Rino karena badannya besar dan bercula. Mereka diam seribu bahasa.</p><p>Binatang hutan pun berkumpul. Hari si harimau mengusulkan agar meminta bantuan Ucil si kancil. Ucil menemui Rino dan berkata, "Tuan, ada makhluk gaib yang menutup jalan air." Rino percaya dan pergi mengecek. Saat itulah hewan lain bisa minum.</p>`,
+        'S_FOLIVORA': `<h3>Hewan Pemakan Daun</h3><p>Hewan herbivora yang hanya makan daun disebut <strong>Folivora</strong>. Daun susah dicerna dan kadang mengandung racun. Tubuh hewan folivora punya cara khusus, yaitu usus yang panjang dan gerakan tubuh yang lambat untuk menghemat energi. Contohnya adalah Koala dan Panda.</p>`,
+        'S_DISKON': `<h3>Toko Buku ABC</h3><p>Menjelang tahun ajaran baru, Toko Buku ABC memberikan diskon <strong>10%</strong> untuk semua buku.</p><ul><li>Harga Buku Cerita (Y): Rp24.000,00</li><li>Harga Buku Pelajaran (X): Setengah dari harga Buku Cerita</li><li>Harga Kamus (Z): 0,75 kali harga Buku Cerita</li></ul>`,
+        'S_DADU': `<h3>Permainan Ular Tangga</h3><p>Mae melempar dadu. Diketahui jumlah titik pada dua sisi berlawanan pada dadu selalu berjumlah 7 (Contoh: 1 berlawanan dengan 6). Mae melempar dadu dan sisi <strong>ATAS</strong> menunjukkan angka <strong>4</strong>.</p>`,
+        'S_SEMBAKO': `<h3>Paket Sembako</h3><p>SD Harapan membagikan paket sembako berisi:</p><ul><li>3 kg beras</li><li>2 bungkus gula pasir (per bungkus 5 hg)</li><li>5 bungkus mi instan (per bungkus 85 g)</li></ul>`,
+        'S_DATA': `<h3>Data Pengunjung Perpustakaan</h3><p>Data 5 hari pertama:</p><table style="width:100%"><tr><th>Hari</th><th>Senin</th><th>Selasa</th><th>Rabu</th><th>Kamis</th><th>Jumat</th></tr><tr><td align="center">Jml</td><td align="center">15</td><td align="center">18</td><td align="center">20</td><td align="center">24</td><td align="center">20</td></tr></table>`,
+        'S_UMUM': `<div style="text-align:center; color:#888; padding:50px;"><i>Soal ini tidak menggunakan bacaan khusus. Silakan kerjakan langsung.</i></div>`
+    };
+
+    let questions = [];
+
+    // === 2. GENERATOR SOAL ===
+    function initQuestions() {
+        // --- BAHASA INDONESIA (1-30) ---
+        // Soal Asli PDF
+        questions.push(
+            {id:1, m:'BI', t:'PG', s:'S_FABEL', q:'Siapa yang memiliki usul untuk meminta bantuan hewan cerdik?', o:[{t:'Bani Kelinci',v:'A'},{t:'Ucil Kancil',v:'B'},{t:'Rino Badak',v:'C'},{t:'Hari Harimau',v:'D'}], k:'D'},
+            {id:2, m:'BI', t:'PGK-BS', s:'S_FABEL', q:'Tentukan Sesuai/Tidak Sesuai perilaku tokoh!', r:[{t:'Rino mementingkan diri sendiri.',o:['Sesuai','Tidak Sesuai']},{t:'Hewan lain berani melawan Rino secara langsung.',o:['Sesuai','Tidak Sesuai']}], k:{0:'Sesuai',1:'Tidak Sesuai'}},
+            {id:3, m:'BI', t:'PG', s:'S_FABEL', q:'Apa arti ungkapan "diam seribu bahasa"?', o:[{t:'Tidak mampu melakukan sesuatu',v:'A'},{t:'Menahan untuk tidak berkomentar',v:'B'},{t:'Tidak mau mendengar',v:'C'},{t:'Tidak tahu masalah',v:'D'}], k:'B'},
+            {id:4, m:'BI', t:'PGK-M', s:'S_FOLIVORA', q:'Hewan apa saja yang termasuk Folivora? (Pilih >1)', o:[{t:'Sapi',v:'1'},{t:'Koala',v:'2'},{t:'Panda',v:'3'},{t:'Singa',v:'4'}], k:['2','3']},
+            {id:5, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Bagan mana yang sesuai untuk teks tersebut?', o:[{t:'Pengertian -> Cara Mencerna -> Contoh',v:'A'},{t:'Contoh -> Pengertian -> Cara Mencerna',v:'B'},{t:'Cara Mencerna -> Contoh -> Pengertian',v:'C'},{t:'Tiga Kelompok -> Pengertian -> Cara Mencerna -> Contoh',v:'D'}], k:'D'},
+            {id:6, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Gagasan utama paragraf ketiga adalah...', o:[{t:'Jenis daun',v:'A'},{t:'Pembagian hewan',v:'B'},{t:'Cara tubuh mencerna daun',v:'C'},{t:'Contoh hewan folivora',v:'D'}], k:'C'}
+        );
+        // Filler BI
+        for(let i=7; i<=30; i++) {
+            questions.push({id:i, m:'BI', t:'PG', s:'S_UMUM', q:`(Simulasi No.${i}) Sinonim kata "Efisien" adalah...`, o:[{t:'Boros',v:'A'},{t:'Tepat guna',v:'B'},{t:'Cepat',v:'C'},{t:'Lambat',v:'D'}], k:'B'});
+        }
+
+        // --- MATEMATIKA (31-60) ---
+        // Soal Asli PDF
+        questions.push(
+            {id:31, m:'MTK', t:'PG', s:'S_UMUM', q:'Hasil dari 120% : 3 + 2 x 0,75 + 2/3 = ...', o:[{t:'11/30',v:'A'},{t:'49/60',v:'B'},{t:'31/30',v:'C'},{t:'98/60',v:'D'}], k:'A'},
+            {id:32, m:'MTK', t:'PG', s:'S_DISKON', q:'Harga buku X + Z setelah diskon adalah...', o:[{t:'Rp18.000',v:'A'},{t:'Rp24.000',v:'B'},{t:'Rp27.000',v:'C'},{t:'Rp30.000',v:'D'}], k:'C'},
+            {id:33, m:'MTK', t:'PGK-BS', s:'S_UMUM', q:'Pak Bondan punya 9 wadah susu (4.75 liter/wadah). Dibagi ke botol besar & kecil.', r:[{t:'Total produksi 42.75 liter',o:['Benar','Salah']},{t:'Isi botol kecil 57/74 liter',o:['Benar','Salah']}], k:{0:'Benar',1:'Benar'}},
+            {id:34, m:'MTK', t:'PG', s:'S_DADU', q:'Jika sisi ATAS dadu 4, maka sisi BAWAH adalah...', o:[{t:'2',v:'A'},{t:'3',v:'B'},{t:'4',v:'C'},{t:'5',v:'D'}], k:'B'},
+            {id:35, m:'MTK', t:'PGK-M', s:'S_SEMBAKO', q:'Pernyataan tentang berat sembako (Pilih >1)', o:[{t:'Total berat 4.425 gram',v:'1'},{t:'Berat mi instan > 0.5 kg',v:'2'},{t:'Gula pasir > Mi instan',v:'3'}], k:['1','3']},
+            {id:36, m:'MTK', t:'PGK-BS', s:'S_DATA', q:'Analisis Data Pengunjung:', r:[{t:'Senin hanya 3/4 dari Rabu',o:['Benar','Salah']},{t:'Total pengunjung 100 orang',o:['Benar','Salah']}], k:{0:'Benar',1:'Salah'}}
+        );
+        // Filler MTK
+        for(let i=37; i<=60; i++) {
+            questions.push({id:i, m:'MTK', t:'PG', s:'S_UMUM', q:`(Simulasi No.${i}) Keliling persegi dengan sisi ${i-30} cm adalah...`, o:[{t:`${(i-30)*4} cm`,v:'A'},{t:`${(i-30)*2} cm`,v:'B'},{t:'100 cm',v:'C'},{t:'10 cm',v:'D'}], k:'A'});
+        }
+    }
+
+    // === 3. LOGIC ENGINE (FUNGSI UTAMA) ===
+    let currentIdx = 0;
+    let userAns = {}; 
+    let flags = {};
+    let timerRef;
+
+    // Fungsi Mulai Aplikasi
+    function startApp() {
+        const token = document.getElementById('tokenUjian').value.toUpperCase();
+        if(token === 'SD2025' || token === 'ACAK') {
+            document.getElementById('headerUser').innerText = "Peserta: " + (document.getElementById('namaPeserta').value || 'Siswa');
+            
+            initQuestions(); // Generate Soal
+            
+            if(token === 'ACAK') shuffleOptions();
+            
+            renderGrid();
+            loadQ(0);
+            startTimer();
+            
+            // Hilangkan Layer Login
+            document.getElementById('loginModal').style.display = 'none';
+        } else {
+            // Tampilkan Pesan Error
+            document.getElementById('loginError').style.display = 'block';
+        }
+    }
+
+    function shuffleOptions() {
+        questions.forEach(q => {
+            if(q.t === 'PG' || q.t === 'PGK-M') {
+                for (let i = q.o.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [q.o[i], q.o[j]] = [q.o[j], q.o[i]];
+                }
+            }
+        });
+    }
+
+    function renderGrid() {
+        const gBI = document.getElementById('grid-BI');
+        const gMTK = document.getElementById('grid-MTK');
+        gBI.innerHTML = ''; 
+        gMTK.innerHTML = '';
+        
+        questions.forEach((q, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'num-btn';
+            btn.id = `nav-${idx}`;
+            btn.innerText = q.id;
+            btn.onclick = () => loadQ(idx);
+            
+            if(q.m === 'BI') gBI.appendChild(btn); else gMTK.appendChild(btn);
+        });
+    }
+
+    function loadQ(idx) {
+        currentIdx = idx;
+        const q = questions[idx];
+        
+        // Setup Tampilan
+        document.getElementById('stimulusBox').innerHTML = stimuli[q.s];
+        document.getElementById('badgeMapel').innerText = q.m === 'BI' ? 'B. INDONESIA' : 'MATEMATIKA';
+        document.getElementById('badgeMapel').style.background = q.m === 'BI' ? '#ef6c00' : '#1565c0';
+        document.getElementById('badgeType').innerText = q.t.replace('PGK-','PG KOMPLEKS ');
+
+        // Render Soal
+        let html = `<div class="q-body">No. ${q.id}. ${q.q}</div>`;
+        
+        if(q.t === 'PG') {
+            html += `<div class="opt-list">`;
+            q.o.forEach(opt => {
+                const chk = userAns[idx] === opt.v ? 'checked' : '';
+                html += `<label class="opt"><input type="radio" name="ans" value="${opt.v}" ${chk} onchange="save('${opt.v}')"><span>${opt.t}</span></label>`;
+            });
+            html += `</div>`;
+        } else if(q.t === 'PGK-M') {
+            html += `<div class="opt-list">`;
+            q.o.forEach(opt => {
+                const chk = userAns[idx] && userAns[idx].includes(opt.v) ? 'checked' : '';
+                html += `<label class="opt"><input type="checkbox" value="${opt.v}" ${chk} onchange="saveMulti(this)"><span>${opt.t}</span></label>`;
+            });
+            html += `</div>`;
+        } else if(q.t === 'PGK-BS') {
+            html += `<table class="bs-table"><thead><tr><th>Pernyataan</th>`;
+            q.r[0].o.forEach(h => html += `<th>${h}</th>`);
+            html += `</tr></thead><tbody>`;
+            q.r.forEach((row, rI) => {
+                html += `<tr><td>${row.t}</td>`;
+                row.o.forEach(op => {
+                    const chk = userAns[idx] && userAns[idx][rI] === op ? 'checked' : '';
+                    html += `<td class="center"><input type="radio" name="r${rI}" value="${op}" ${chk} onchange="saveMtrx(${rI},'${op}')"></td>`;
+                });
+                html += `</tr>`;
+            });
+            html += `</tbody></table>`;
+        }
+        
+        document.getElementById('questionBox').innerHTML = html;
+        
+        // UI Updates
+        document.getElementById('checkRagu').checked = !!flags[idx];
+        updateNav();
+        
+        document.getElementById('btnPrev').disabled = idx === 0;
+        if(idx === questions.length - 1) {
+            document.getElementById('btnNext').style.display = 'none';
+            document.getElementById('btnEnd').style.display = 'block';
+        } else {
+            document.getElementById('btnNext').style.display = 'block';
+            document.getElementById('btnEnd').style.display = 'none';
+        }
+
+        if(q.m === 'BI') switchTab('BI'); else switchTab('MTK');
+    }
+
+    // --- SAVING DATA ---
+    function save(val) { userAns[currentIdx] = val; updateNav(); }
+    
+    function saveMulti(el) {
+        if(!userAns[currentIdx]) userAns[currentIdx] = [];
+        if(el.checked) userAns[currentIdx].push(el.value);
+        else userAns[currentIdx] = userAns[currentIdx].filter(x => x !== el.value);
+        updateNav();
+    }
+    
+    function saveMtrx(r, val) {
+        if(!userAns[currentIdx]) userAns[currentIdx] = {};
+        userAns[currentIdx][r] = val;
+        updateNav();
+    }
+    
+    function toggleFlag() {
+        if(document.getElementById('checkRagu').checked) flags[currentIdx] = true; else delete flags[currentIdx];
+        updateNav();
+    }
+
+    function updateNav() {
+        document.querySelectorAll('.num-btn').forEach(b => {
+            const id = parseInt(b.id.split('-')[1]);
+            b.className = 'num-btn';
+            if(id === currentIdx) b.classList.add('current');
+            
+            const a = userAns[id];
+            // Cek apakah sudah dijawab (support array/object/string)
+            if(a && (Array.isArray(a) ? a.length>0 : (typeof a === 'object' ? Object.keys(a).length>0 : true))) {
+                b.classList.add('done');
+            }
+            if(flags[id]) b.classList.add('flag');
+        });
+    }
+
+    function switchTab(t) {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.grid').forEach(g => g.classList.remove('active'));
+        if(t === 'BI') {
+            document.querySelector('.tab:nth-child(1)').classList.add('active');
+            document.getElementById('grid-BI').classList.add('active');
+        } else {
+            document.querySelector('.tab:nth-child(2)').classList.add('active');
+            document.getElementById('grid-MTK').classList.add('active');
+        }
+    }
+    
+    function nav(step) {
+        const n = currentIdx + step;
+        if(n >= 0 && n < questions.length) loadQ(n);
+    }
+
+    // --- SCORING & TIMER ---
+    function finish() {
+        if(!confirm("Yakin selesai dan lihat nilai?")) return;
+        clearInterval(timerRef);
+        
+        let sBI = 0, sMTK = 0;
+        
+        questions.forEach((q, i) => {
+            const a = userAns[i];
+            if(!a) return;
+            
+            let isCorrect = false;
+            // Logic Penilaian
+            if(q.t === 'PG') {
+                if(a === q.k) isCorrect = true;
+            } else if(q.t === 'PGK-M') {
+                if(a.length === q.k.length && a.sort().toString() === q.k.sort().toString()) isCorrect = true;
+            } else if(q.t === 'PGK-BS') {
+                let match = true;
+                if(Object.keys(a).length !== Object.keys(q.k).length) match = false;
+                for(let k in q.k) if(a[k] !== q.k[k]) match = false;
+                if(match) isCorrect = true;
+            }
+            
+            if(isCorrect) { if(q.m === 'BI') sBI++; else sMTK++; }
+        });
+        
+        const final = Math.round(((sBI + sMTK) / 60) * 100);
+        document.getElementById('finalScore').innerText = final;
+        document.getElementById('resBI').innerText = `${sBI}/30`;
+        document.getElementById('resMTK').innerText = `${sMTK}/30`;
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+
+    function startTimer() {
+        let t = 7200; // 120 menit
+        timerRef = setInterval(() => {
+            t--;
+            const m = Math.floor(t/60).toString().padStart(2,'0');
+            const s = (t%60).toString().padStart(2,'0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+            if(t<=0) { finish(); clearInterval(timerRef); }
+        }, 1000);
+    }
+
+    // --- SAFETY PREVENT RELOAD ---
+    window.onbeforeunload = function() {
+        if(document.getElementById('resultModal').style.display !== 'flex') return "Yakin keluar?";
+    };
+</script>
+</body>
+</html>
