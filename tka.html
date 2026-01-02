@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CBT TKA SD 2025 - Mobile Friendly</title>
+    <style>
+        /* --- 1. CSS SYSTEM (RESPONSIVE) --- */
+        :root { --primary: #0d47a1; --accent: #1976d2; --bg: #f4f7f6; --text: #333; --success: #2e7d32; --warning: #ff8f00; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg); height: 100vh; display: flex; flex-direction: column; color: var(--text); overflow: hidden; }
+
+        /* HEADER */
+        header {
+            height: 55px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 20;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; font-weight: bold; font-size: 1.1rem; }
+        .menu-btn { font-size: 1.5rem; cursor: pointer; display: none; } /* Hidden on Desktop */
+        .timer-box { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; font-family: monospace; font-weight: bold; font-size: 1.1rem; }
+
+        /* LAYOUT UTAMA */
+        .container { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+        /* SIDEBAR (Nomor Soal) */
+        .sidebar {
+            width: 280px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column;
+            transition: transform 0.3s ease; z-index: 15;
+        }
+        .mapel-tabs { display: flex; background: #e3f2fd; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #555; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: white; }
+        
+        .nav-body { flex: 1; overflow-y: auto; padding: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; display: none; }
+        .grid.active { display: grid; }
+        
+        .num-box {
+            aspect-ratio: 1; border: 1px solid #ccc; border-radius: 4px; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; font-weight: bold; font-size: 0.9rem; background: white; color: #555;
+        }
+        .num-box.current { background: var(--primary); color: white; border-color: var(--primary); }
+        .num-box.done { background: var(--success); color: white; border-color: var(--success); }
+        .num-box.flag { border: 2px solid var(--warning); color: var(--warning); }
+
+        /* AREA SOAL (Split Screen) */
+        .main-content { flex: 1; display: flex; overflow: hidden; }
+        
+        /* Panel Kiri (Bacaan) */
+        .panel-read {
+            flex: 1; padding: 20px; overflow-y: auto; border-right: 2px solid #ddd; background: #fff;
+            font-size: 1rem; line-height: 1.6; max-width: 50%;
+        }
+        .panel-read h3 { color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #bbdefb; }
+        .panel-read table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 10px 0; }
+        .panel-read th, .panel-read td { border: 1px solid #ccc; padding: 5px; }
+        
+        /* Panel Kanan (Pertanyaan) */
+        .panel-question { flex: 1; padding: 20px; overflow-y: auto; background: #f9fbff; }
+        .q-badges { display: flex; gap: 8px; margin-bottom: 15px; }
+        .badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; color: white; font-weight: bold; text-transform: uppercase; }
+        .q-text { font-size: 1.1rem; font-weight: 500; margin-bottom: 20px; line-height: 1.5; }
+
+        /* OPSI JAWABAN */
+        .opt-group { display: flex; flex-direction: column; gap: 10px; }
+        .opt-item {
+            display: flex; gap: 10px; padding: 12px; background: white; border: 1px solid #ccc; border-radius: 8px;
+            cursor: pointer; align-items: flex-start; transition: 0.2s;
+        }
+        .opt-item:active { background: #e3f2fd; } /* Touch feedback */
+        .opt-item input { margin-top: 4px; transform: scale(1.3); }
+        .opt-item span { flex: 1; }
+
+        /* TABEL PG KOMPLEKS */
+        .matrix { width: 100%; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; background: white; border-collapse: collapse; }
+        .matrix th, .matrix td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
+        .matrix td:first-child { text-align: left; border-right: 1px solid #eee; }
+        .matrix th { background: #eceff1; }
+
+        /* FOOTER NAVIGASI */
+        footer {
+            height: 60px; background: white; border-top: 1px solid #ddd; padding: 0 15px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 20;
+        }
+        .ragu-wrapper { display: flex; align-items: center; gap: 8px; font-weight: bold; color: var(--warning); }
+        .nav-buttons { display: flex; gap: 10px; }
+        .btn {
+            padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; color: white; cursor: pointer; font-size: 0.95rem;
+        }
+        .btn-prev { background: #90a4ae; }
+        .btn-next { background: var(--primary); }
+        .btn-finish { background: var(--success); display: none; }
+
+        /* --- MOBILE RESPONSIVE TWEAKS --- */
+        @media (max-width: 768px) {
+            .menu-btn { display: block; }
+            
+            /* Sidebar sembunyi di kiri */
+            .sidebar { position: absolute; height: 100%; left: 0; top: 0; transform: translateX(-100%); box-shadow: 2px 0 10px rgba(0,0,0,0.2); width: 80%; }
+            .sidebar.active { transform: translateX(0); }
+            
+            /* Layout Soal Menumpuk (Stack) */
+            .main-content { flex-direction: column; }
+            .panel-read { max-width: 100%; height: 35%; border-right: none; border-bottom: 2px solid #ddd; font-size: 0.95rem; }
+            .panel-question { height: 65%; font-size: 1rem; }
+            
+            /* Tombol lebih besar untuk jari */
+            .btn { padding: 12px 18px; }
+            .num-box { font-size: 1rem; }
+        }
+
+        /* MODALS (Login & Result) */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .input-group input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 6px; font-size: 1rem; }
+        
+        .score-circle { width: 100px; height: 100px; background: var(--primary); color: white; border-radius: 50%; font-size: 2.5rem; font-weight: 800; display: flex; justify-content: center; align-items: center; margin: 20px auto; border: 5px solid #bbdefb; }
+        .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="overlay" id="loginModal">
+    <div class="card">
+        <h2 style="color:var(--primary); margin-bottom:5px;">CBT TKA SD</h2>
+        <p style="color:#777; margin-bottom:20px;">Ujian Berbasis Komputer</p>
+        
+        <div class="input-group">
+            <label>Nama Siswa</label>
+            <input type="text" id="nama" placeholder="Nama Lengkap">
+        </div>
+        <div class="input-group">
+            <label>Token Ujian</label>
+            <input type="text" id="token" placeholder="SD2025" style="text-transform:uppercase; text-align:center; letter-spacing:2px;">
+        </div>
+        
+        <button class="btn btn-next" style="width:100%; margin-top:10px;" onclick="login()">MULAI UJIAN</button>
+        <p id="errorMsg" style="color:red; margin-top:10px; font-size:0.9rem; display:none;">Token Salah!</p>
+        
+        <div style="margin-top:20px; font-size:0.8rem; background:#f0f2f5; padding:8px; border-radius:5px;">
+            Token: <b>SD2025</b> / <b>ACAK</b>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div class="header-left">
+        <div class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i> &#9776;</div>
+        <span>TKA 2025</span>
+    </div>
+    <div class="timer-box" id="timer">120:00</div>
+</header>
+
+<div class="container">
+    <nav class="sidebar" id="sidebar">
+        <div style="padding:15px; border-bottom:1px solid #eee; font-weight:bold;">Daftar Soal</div>
+        <div class="mapel-tabs">
+            <button class="tab-btn active" onclick="switchTab('BI')">B.INDO</button>
+            <button class="tab-btn" onclick="switchTab('MTK')">MATEMATIKA</button>
+        </div>
+        <div class="nav-body">
+            <div id="grid-BI" class="grid active"></div>
+            <div id="grid-MTK" class="grid"></div>
+        </div>
+    </nav>
+
+    <main class="main-content" onclick="closeSidebar()">
+        <div class="panel-read">
+            <div id="stimulusBox"></div>
+        </div>
+        <div class="panel-question">
+            <div class="q-badges">
+                <span class="badge" id="badgeMapel" style="background:#ef6c00">Mapel</span>
+                <span class="badge" id="badgeType" style="background:#78909c">Tipe</span>
+            </div>
+            <div id="questionBox"></div>
+        </div>
+    </main>
+</div>
+
+<footer>
+    <label class="ragu-wrapper">
+        <input type="checkbox" id="raguCheck" onchange="toggleFlag()"> Ragu
+    </label>
+    <div class="nav-buttons">
+        <button class="btn btn-prev" id="btnPrev" onclick="nav(-1)"> < </button>
+        <button class="btn btn-next" id="btnNext" onclick="nav(1)"> > </button>
+        <button class="btn btn-finish" id="btnEnd" onclick="finishExam()">KIRIM</button>
+    </div>
+</footer>
+
+<div class="overlay" id="resultModal" style="display:none;">
+    <div class="card">
+        <h2 style="color:var(--success)">UJIAN SELESAI</h2>
+        <div class="score-circle" id="finalScore">0</div>
+        
+        <div class="score-grid">
+            <div>
+                <small>B. Indonesia</small><br>
+                <b id="scoreBI" style="color:#ef6c00; font-size:1.2rem;">0/30</b>
+            </div>
+            <div>
+                <small>Matematika</small><br>
+                <b id="scoreMTK" style="color:#1565c0; font-size:1.2rem;">0/30</b>
+            </div>
+        </div>
+        
+        <div style="margin-top:20px; font-size:0.85rem;" id="statusMsg">
+            Data berhasil disimpan.
+        </div>
+        <button class="btn btn-next" style="width:100%; margin-top:20px;" onclick="location.reload()">KELUAR</button>
+    </div>
+</div>
+
+<script>
+    // === CONFIG ===
+    // Paste URL Google Apps Script di sini:
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyiD74zcZ463YyM2I8aK5uTusXbLOldMOF0PUJC4VzmfrbAizK6AamTRwrZWArcAuTs/exec"; 
+
+    // === DATA SOAL (LENGKAP) ===
+    const stimuli = {
+        'S_FABEL': `<h3>Danau untuk Semua</h3><p>Di hutan ada danau. Rino si badak berendam sehingga air keruh. Hewan lain takut menegur. Ucil si kancil punya ide menipu Rino bahwa ada penunggu danau. Rino takut dan pergi.</p>`,
+        'S_FOLIVORA': `<h3>Hewan Folivora</h3><p>Folivora adalah herbivora pemakan daun. Daun sulit dicerna, jadi hewan ini punya usus panjang dan gerak lambat. Contoh: Koala, Panda.</p>`,
+        'S_DISKON': `<h3>Toko Buku</h3><p>Diskon 10% semua buku. <br>1. Buku Cerita: Rp24.000 <br>2. Buku Pelajaran: 1/2 harga cerita <br>3. Kamus: 0.75 harga cerita.</p>`,
+        'S_UMUM': `<div style="text-align:center; padding:30px; color:#999;"><i>Kerjakan soal berikut dengan teliti.</i></div>`
+    };
+
+    let questions = [];
+
+    // GENERATE 60 SOAL
+    function initDB() {
+        // 6 Soal Contoh
+        questions.push(
+            {id:1, m:'BI', t:'PG', s:'S_FABEL', q:'Siapa yang punya ide cerdik?', o:[{t:'Kelinci',v:'A'},{t:'Kancil',v:'B'},{t:'Badak',v:'C'},{t:'Harimau',v:'D'}], k:'B'},
+            {id:2, m:'BI', t:'PGK-BS', s:'S_FABEL', q:'Perilaku Tokoh:', r:[{t:'Rino egois',o:['Sesuai','Tidak']},{t:'Hewan lain berani',o:['Sesuai','Tidak']}], k:{0:'Sesuai',1:'Tidak'}},
+            {id:3, m:'BI', t:'PG', s:'S_FABEL', q:'Makna "diam seribu bahasa"?', o:[{t:'Bisu',v:'A'},{t:'Tidak berkomentar',v:'B'},{t:'Tidur',v:'C'},{t:'Marah',v:'D'}], k:'B'},
+            {id:4, m:'BI', t:'PGK-M', s:'S_FOLIVORA', q:'Contoh Folivora (Pilih >1)', o:[{t:'Sapi',v:'1'},{t:'Koala',v:'2'},{t:'Panda',v:'3'},{t:'Singa',v:'4'}], k:['2','3']},
+            {id:5, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Mengapa Folivora lambat?', o:[{t:'Malas',v:'A'},{t:'Hemat energi',v:'B'},{t:'Sakit',v:'C'},{t:'Kenyang',v:'D'}], k:'B'},
+            {id:6, m:'BI', t:'PG', s:'S_FOLIVORA', q:'Ide pokok paragraf?', o:[{t:'Jenis hewan',v:'A'},{t:'Makanan',v:'B'},{t:'Ciri Folivora',v:'C'},{t:'Hutan',v:'D'}], k:'C'}
+        );
+        // Filler BI (7-30)
+        for(let i=7; i<=30; i++) questions.push({id:i, m:'BI', t:'PG', s:'S_UMUM', q:`Soal Simulasi BI No.${i}. Antonim "Panas"?`, o:[{t:'Dingin',v:'A'},{t:'Hangat',v:'B'},{t:'Terbakar',v:'C'},{t:'Beku',v:'D'}], k:'A'});
+        
+        // MTK 31-36 Contoh
+        questions.push(
+            {id:31, m:'MTK', t:'PG', s:'S_UMUM', q:'120% : 3 + 0.75 = ...', o:[{t:'1.15',v:'A'},{t:'0.9',v:'B'},{t:'1.5',v:'C'},{t:'2.0',v:'D'}], k:'A'},
+            {id:32, m:'MTK', t:'PG', s:'S_DISKON', q:'Harga Kamus diskon?', o:[{t:'16.200',v:'A'},{t:'18.000',v:'B'},{t:'20.000',v:'C'},{t:'15.000',v:'D'}], k:'A'},
+            {id:33, m:'MTK', t:'PGK-BS', s:'S_UMUM', q:'Pernyataan Bilangan:', r:[{t:'1/2 = 0.5',o:['Benar','Salah']},{t:'10 > 5',o:['Benar','Salah']}], k:{0:'Benar',1:'Benar'}},
+            {id:34, m:'MTK', t:'PG', s:'S_UMUM', q:'Keliling Persegi sisi 5?', o:[{t:'20',v:'A'},{t:'25',v:'B'},{t:'10',v:'C'},{t:'15',v:'D'}], k:'A'},
+            {id:35, m:'MTK', t:'PGK-M', s:'S_UMUM', q:'Bilangan Prima (Pilih >1)', o:[{t:'2',v:'1'},{t:'9',v:'2'},{t:'11',v:'3'}], k:['1','3']},
+            {id:36, m:'MTK', t:'PGK-BS', s:'S_UMUM', q:'Geometri:', r:[{t:'Segitiga punya 3 sisi',o:['Benar','Salah']},{t:'Lingkaran punya sudut',o:['Benar','Salah']}], k:{0:'Benar',1:'Salah'}}
+        );
+        // Filler MTK (37-60)
+        for(let i=37; i<=60; i++) questions.push({id:i, m:'MTK', t:'PG', s:'S_UMUM', q:`Soal Simulasi MTK No.${i}. Hasil ${i} + 10 = ?`, o:[{t:`${i+10}`,v:'A'},{t:'100',v:'B'},{t:'0',v:'C'},{t:'50',v:'D'}], k:'A'});
+    }
+
+    // === ENGINE ===
+    let idx = 0;
+    let ans = {};
+    let flags = {};
+    let timerRef;
+
+    function login() {
+        const t = document.getElementById('token').value.toUpperCase();
+        if(t === 'SD2025' || t === 'ACAK') {
+            initDB();
+            if(t==='ACAK') shuffle();
+            renderNav();
+            load(0);
+            startTimer();
+            document.getElementById('loginModal').style.display = 'none';
+        } else {
+            document.getElementById('errorMsg').style.display = 'block';
+        }
+    }
+
+    function shuffle() {
+        questions.forEach(q => {
+            if(q.t==='PG'||q.t==='PGK-M') {
+                for(let i=q.o.length-1; i>0; i--) {
+                    const j = Math.floor(Math.random()*(i+1));
+                    [q.o[i],q.o[j]] = [q.o[j],q.o[i]];
+                }
+            }
+        });
+    }
+
+    function renderNav() {
+        const g1 = document.getElementById('grid-BI');
+        const g2 = document.getElementById('grid-MTK');
+        g1.innerHTML=''; g2.innerHTML='';
+        questions.forEach((q, i) => {
+            const b = document.createElement('div');
+            b.className = 'num-box';
+            b.id = `n-${i}`;
+            b.innerText = q.id;
+            b.onclick = () => load(i);
+            if(q.m === 'BI') g1.appendChild(b); else g2.appendChild(b);
+        });
+    }
+
+    function load(i) {
+        idx = i;
+        const q = questions[i];
+        
+        // Stimulus
+        document.getElementById('stimulusBox').innerHTML = stimuli[q.s];
+        
+        // Badges
+        const bgM = document.getElementById('badgeMapel');
+        bgM.innerText = q.m==='BI'?'B. INDONESIA':'MATEMATIKA';
+        bgM.style.background = q.m==='BI'?'#ef6c00':'#1565c0';
+        document.getElementById('badgeType').innerText = q.t;
+
+        // Render Soal
+        let h = `<div class="q-text">No.${q.id}. ${q.q}</div>`;
+        if(q.t === 'PG') {
+            h += `<div class="opt-group">`;
+            q.o.forEach(opt => {
+                const c = ans[i] === opt.v ? 'checked' : '';
+                h += `<label class="opt-item"><input type="radio" name="a" value="${opt.v}" ${c} onchange="sv('${opt.v}')"><span>${opt.t}</span></label>`;
+            });
+            h += `</div>`;
+        } else if(q.t === 'PGK-M') {
+            h += `<div class="opt-group">`;
+            q.o.forEach(opt => {
+                const c = ans[i] && ans[i].includes(opt.v) ? 'checked' : '';
+                h += `<label class="opt-item"><input type="checkbox" value="${opt.v}" ${c} onchange="svMul(this)"><span>${opt.t}</span></label>`;
+            });
+            h += `</div>`;
+        } else if(q.t === 'PGK-BS') {
+            h += `<table class="matrix"><tr><th>Pernyataan</th>`;
+            q.r[0].o.forEach(x => h+=`<th>${x}</th>`);
+            h+=`</tr>`;
+            q.r.forEach((r, ri) => {
+                h+=`<tr><td>${r.t}</td>`;
+                r.o.forEach(op => {
+                    const c = ans[i] && ans[i][ri]===op ? 'checked' : '';
+                    h+=`<td><input type="radio" name="r${ri}" value="${op}" ${c} onchange="svMat(${ri},'${op}')"></td>`;
+                });
+                h+=`</tr>`;
+            });
+            h+=`</table>`;
+        }
+        document.getElementById('questionBox').innerHTML = h;
+
+        // Controls
+        document.getElementById('raguCheck').checked = !!flags[i];
+        updNav();
+        
+        document.getElementById('btnPrev').disabled = i === 0;
+        if(i === questions.length-1) {
+            document.getElementById('btnNext').style.display='none';
+            document.getElementById('btnEnd').style.display='block';
+        } else {
+            document.getElementById('btnNext').style.display='block';
+            document.getElementById('btnEnd').style.display='none';
+        }
+
+        if(q.m==='BI') swTab('BI'); else swTab('MTK');
+    }
+
+    // SAVING
+    function sv(v) { ans[idx] = v; updNav(); }
+    function svMul(e) {
+        if(!ans[idx]) ans[idx]=[];
+        if(e.checked) ans[idx].push(e.value);
+        else ans[idx]=ans[idx].filter(x=>x!==e.value);
+        updNav();
+    }
+    function svMat(r,v) {
+        if(!ans[idx]) ans[idx]={};
+        ans[idx][r]=v;
+        updNav();
+    }
+    function toggleFlag() {
+        if(document.getElementById('raguCheck').checked) flags[idx]=true; else delete flags[idx];
+        updNav();
+    }
+    function updNav() {
+        document.querySelectorAll('.num-box').forEach(b => {
+            const id = parseInt(b.id.split('-')[1]);
+            b.className = 'num-box';
+            if(id===idx) b.classList.add('current');
+            const a = ans[id];
+            if(a && (Array.isArray(a)?a.length>0:(typeof a==='object'?Object.keys(a).length>0:true))) b.classList.add('done');
+            if(flags[id]) b.classList.add('flag');
+        });
+    }
+
+    // NAV & UI
+    function nav(s) { if(idx+s >=0 && idx+s < questions.length) load(idx+s); }
+    function swTab(t) {
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.grid').forEach(g=>g.classList.remove('active'));
+        if(t==='BI') { document.querySelector('.tab-btn:nth-child(1)').classList.add('active'); document.getElementById('grid-BI').classList.add('active'); }
+        else { document.querySelector('.tab-btn:nth-child(2)').classList.add('active'); document.getElementById('grid-MTK').classList.add('active'); }
+    }
+    function toggleSidebar() { document.getElementById('sidebar').classList.add('active'); }
+    function closeSidebar() { document.getElementById('sidebar').classList.remove('active'); }
+
+    // FINISH
+    function finishExam() {
+        if(!confirm("Yakin ingin menyelesaikan ujian dan mengirim jawaban?")) return;
+        
+        clearInterval(timerRef);
+        const btn = document.getElementById('btnEnd');
+        btn.innerText = "Mengirim...";
+        btn.disabled = true;
+
+        // Calc Score
+        let s1=0, s2=0;
+        questions.forEach((q, i) => {
+            const a = ans[i];
+            if(!a) return;
+            let ok = false;
+            if(q.t==='PG' && a===q.k) ok=true;
+            else if(q.t==='PGK-M' && a.length===q.k.length && a.sort().toString()===q.k.sort().toString()) ok=true;
+            else if(q.t==='PGK-BS') {
+                let m=true;
+                if(Object.keys(a).length!==Object.keys(q.k).length) m=false;
+                for(let k in q.k) if(a[k]!==q.k[k]) m=false;
+                if(m) ok=true;
+            }
+            if(ok) { if(q.m==='BI') s1++; else s2++; }
+        });
+
+        const final = Math.round(((s1+s2)/60)*100);
+        
+        // Payload
+        const data = {
+            nama: document.getElementById('nama').value,
+            token: document.getElementById('token').value,
+            nilai: final, bi: s1, mtk: s2,
+            jawaban: JSON.stringify(ans)
+        };
+
+        // Send to GAS
+        if(GAS_URL.includes("script.google.com")) {
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(()=>{ showRes(final,s1,s2,true); })
+              .catch(()=>{ showRes(final,s1,s2,false); });
+        } else {
+            showRes(final,s1,s2,false);
+        }
+    }
+
+    function showRes(f, s1, s2, ok) {
+        document.getElementById('finalScore').innerText = f;
+        document.getElementById('scoreBI').innerText = `${s1}/30`;
+        document.getElementById('scoreMTK').innerText = `${s2}/30`;
+        document.getElementById('statusMsg').innerText = ok ? "Data Tersimpan di Server." : "Data Tampil Lokal (Gagal Koneksi).";
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+
+    function startTimer() {
+        let t = 7200;
+        timerRef = setInterval(()=>{
+            t--;
+            const m = Math.floor(t/60).toString().padStart(2,'0');
+            const s = (t%60).toString().padStart(2,'0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+            if(t<=0) finishExam();
+        },1000);
+    }
+</script>
+</body>
+</html>
